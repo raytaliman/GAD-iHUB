@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ihub-db
+    restart: always
+    environment:
+      POSTGRES_DB: ihub
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/migrations:/migrations:ro
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./data/db:/var/lib/postgresql/data
+
+  api:
+    image: postgrest/postgrest
+    container_name: ihub-api
+    restart: always
+    environment:
+      PGRST_DB_URI: postgres://postgres:password@db:5432/ihub
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: postgres
+      # Set a simpler JWT secret for local development
+      PGRST_JWT_SECRET: "super-secret-jwt-key-for-local-development-12345"
+      PGRST_LOG_LEVEL: info
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  adminer:
+    image: adminer
+    container_name: ihub-adminer
+    restart: always
+    ports:
+      - "8081:8080"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ihub-app
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    environment:
+      - VITE_SUPABASE_URL=http://localhost:3000
+      - VITE_SUPABASE_ANON_KEY=local_placeholder_key
+
+# No global volumes needed for bind mounts
