@@ -33,9 +33,9 @@ export default function ChartTopOffices({ data }) {
 
     if (categories.length === 0) {
         return (
-            <div className="bg-white rounded-2xl p-6 border border-black/25 shadow-card">
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
                 <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                    <Building2 size={16} className="text-primary" />
+                    <Building2 size={16} className="text-[#7030a0]" />
                     Top 4 Units
                 </h3>
                 <div className="text-slate-400 text-sm py-4 text-center italic">Awaiting unit data...</div>
@@ -131,7 +131,7 @@ export default function ChartTopOffices({ data }) {
     };
 
     return (
-        <div className="bg-white rounded-2xl p-4 border border-black/25 shadow-card h-full overflow-hidden flex flex-col">
+        <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm h-full overflow-hidden flex flex-col">
             <div className="flex items-center justify-between mb-3 px-1">
                 <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
                     <Building2 size={16} className="text-primary" />

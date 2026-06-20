@@ -14,7 +14,7 @@ export function useFeedbackForm() {
     
     // Main form state containing all user inputs
     const [formData, setFormData] = useState({
-        firstName: '', lastName: '', sex: '', countryCode: '+63', contactNumber: '',
+        firstName: '', middleName: '', lastName: '', sex: '', email: '', birthdate: '', countryCode: '+63', contactNumber: '',
         clientType: 'Internal', officeUnitAddress: '', officeUnitOther: '',
         province: '', city: '', barangay: '',
         children: [{ name: '', age: '', sex: '' }],
@@ -25,15 +25,21 @@ export function useFeedbackForm() {
     });
 
     // Navigation and flow control state
-    const [flowType, setFlowType] = useState(null); // 'register' | 'evaluate' | null
+    const [flowType, setFlowType] = useState(window.location.pathname === '/registration' ? 'register' : null); // 'register' | 'evaluate' | null
     const [userCode, setUserCode] = useState(''); // 5-digit code entered by user
     const [codeValidated, setCodeValidated] = useState(false); // Whether enter code is verified
     const [generatedCode, setGeneratedCode] = useState(''); // Newly generated code for registration
     const [registrationId, setRegistrationId] = useState(null); // DB ID of the current registration record
     const [currentPart, setCurrentPart] = useState(0); // Current wizard step index
-    const [showCoverPage, setShowCoverPage] = useState(true); // Toggle for intro screen
+    const [showCoverPage, setShowCoverPage] = useState(window.location.pathname === '/registration' ? false : true); // Toggle for intro screen
     const [showThankYou, setShowThankYou] = useState(false); // Toggle for success screen
     const [submitting, setSubmitting] = useState(false); // Form submission status
+    const [snackbar, setSnackbar] = useState({ show: false, message: '', type: 'error' });
+
+    const triggerSnackbar = (message, type = 'error') => {
+        setSnackbar({ show: true, message, type });
+    };
+
 
     /**
      * Effect hook to fetch form structure (parts and questions) from Supabase on mount.
@@ -96,18 +102,43 @@ export function useFeedbackForm() {
     };
 
     /**
+     * Validates basic user/parent details (Step 1 of Registration).
+     * @returns {boolean} True if valid.
+     */
+    const validateBasicInfo = () => {
+        if (!formData.firstName.trim()) { triggerSnackbar('Please enter your first name'); return false; }
+        if (!formData.lastName.trim()) { triggerSnackbar('Please enter your last name'); return false; }
+        if (!formData.birthdate) { triggerSnackbar('Please enter your birthdate'); return false; }
+        if (formData.contactNumber.replace(/\D/g, '').length !== 10) { triggerSnackbar('Contact number must be exactly 10 digits.'); return false; }
+        if (formData.clientType === 'Internal' && !formData.officeUnitAddress) { triggerSnackbar('Please select your office/unit'); return false; }
+        if ((formData.clientType === 'External' || formData.officeUnitAddress === 'Others') && !formData.officeUnitOther.trim()) { triggerSnackbar('Please specify your address'); return false; }
+        return true;
+    };
+
+    /**
+     * Validates children details and activities (Step 2 of Registration).
+     * @returns {boolean} True if valid.
+     */
+    const validateChildrenInfo = () => {
+        const requiresChildren = formData.serviceAvailed === 'Child Minding Station' || formData.serviceAvailed === 'Mother and Child Care';
+        const hasChildData = formData.children.some(c => (c.name || '').trim() || (c.age || '').trim() || (c.sex || '').trim());
+        
+        if (requiresChildren || hasChildData) {
+            if (formData.children.some(c => !(c.name || '').trim() || !(c.age || '').trim() || !(c.sex || '').trim())) {
+                triggerSnackbar('Please fill in all child details (Name, Age, and Sex).');
+                return false;
+            }
+        }
+        if (formData.serviceAvailed === 'Mother and Child Care' && !formData.activities.trim()) { triggerSnackbar('Please enter the activities.'); return false; }
+        return true;
+    };
+
+    /**
      * Validates Part I of the form (Registration details).
      * @returns {boolean} True if valid, shows alert and return false otherwise.
      */
     const validateRegistration = () => {
-        if (!formData.firstName.trim()) { alert('Please enter your first name'); return false; }
-        if (!formData.lastName.trim()) { alert('Please enter your last name'); return false; }
-        if (formData.contactNumber.replace(/\D/g, '').length !== 10) { alert('Contact number must be exactly 10 digits.'); return false; }
-        if (formData.clientType === 'Internal' && !formData.officeUnitAddress) { alert('Please select your office/unit'); return false; }
-        if ((formData.clientType === 'External' || formData.officeUnitAddress === 'Others') && !formData.officeUnitOther.trim()) { alert('Please specify your address'); return false; }
-        if (formData.children.some(c => !c.name || !c.age || !c.sex)) { alert('Please fill in all child details.'); return false; }
-        if (formData.serviceAvailed === 'Mother and Child Care' && !formData.activities.trim()) { alert('Please enter the activities.'); return false; }
-        return true;
+        return validateBasicInfo() && validateChildrenInfo();
     };
 
     /**
@@ -124,12 +155,16 @@ export function useFeedbackForm() {
                 const { data } = await supabase.from('registrations').select('code').eq('code', code).single();
                 if (!data) isUnique = true;
             }
+            const activeChildren = formData.children.filter(c => (c.name || '').trim() || (c.age || '').trim() || (c.sex || '').trim());
             const row = {
                 code,
                 first_name: formData.firstName,
+                middle_name: formData.middleName || null,
                 last_name: formData.lastName,
-                parent_name: `${formData.firstName} ${formData.lastName}`.trim(),
+                parent_name: `${formData.firstName} ${formData.middleName ? formData.middleName + ' ' : ''}${formData.lastName}`.trim().replace(/\s+/g, ' '),
                 sex: formData.sex || null,
+                email: formData.email || null,
+                birthdate: formData.birthdate || null,
                 country_code: formData.countryCode || null,
                 contact_number: formData.contactNumber,
                 client_type: formData.clientType,
@@ -138,7 +173,7 @@ export function useFeedbackForm() {
                 province: formData.province || null,
                 city: formData.city || null,
                 barangay: formData.barangay || null,
-                children: formData.children,
+                children: activeChildren,
                 date_of_use: formData.dateOfUse,
                 service_availed: formData.serviceAvailed || null,
                 activities: formData.activities || null,
@@ -146,9 +181,31 @@ export function useFeedbackForm() {
             const { error } = await supabase.from('registrations').insert([row]);
             if (error) throw error;
             setGeneratedCode(code);
+
+            // Send registration code to email if provided
+            if (formData.email && formData.email.trim()) {
+                try {
+                    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+                    await fetch(`${apiUrl}/api/send-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: formData.email,
+                            code: code,
+                            parentName: `${formData.firstName} ${formData.lastName}`.trim(),
+                        }),
+                    });
+                } catch (emailErr) {
+                    console.error('Failed to send registration code email:', emailErr);
+                }
+            }
+
             setShowThankYou(true);
         } catch (e) {
-            alert('Could not submit registration.');
+            console.error('Registration submission error:', e);
+            triggerSnackbar(`Could not submit registration. ${e.message || ''}`);
         } finally {
             setSubmitting(false);
         }
@@ -158,16 +215,17 @@ export function useFeedbackForm() {
      * Validates the 5-digit code entered by the user to start an evaluation.
      */
     const validateUserCode = async () => {
-        if (userCode.length !== 5) { alert('Enter a 5-digit code.'); return; }
+        if (userCode.length !== 5) { triggerSnackbar('Enter a 5-digit code.'); return; }
         setSubmitting(true);
         try {
             const { data, error } = await supabase.from('registrations').select('id').eq('code', userCode).single();
-            if (error || !data) throw new Error();
+            if (error || !data) throw new Error(error?.message || 'Code not found');
             setRegistrationId(data.id);
             setCodeValidated(true);
             setCurrentPart(1);
-        } catch {
-            alert('Invalid code.');
+        } catch (e) {
+            console.error('Code validation error:', e);
+            triggerSnackbar('Invalid or non-existent code.');
         } finally {
             setSubmitting(false);
         }
@@ -177,10 +235,14 @@ export function useFeedbackForm() {
      * Validates that all question parts have answers and submits the evaluation to Supabase.
      */
     const submitEvaluation = async () => {
-        const hasAnyRating = (questions) => questions.some(q => formData[q.key] && formData[q.key].trim() !== '');
         for (let i = 0; i < formParts.length; i++) {
-            if (!hasAnyRating(formParts[i].questions)) {
-                alert(`Please answer all required items in ${formParts[i].label}.`);
+            const requiredQuestions = formParts[i].questions.filter(q => q.answerType !== 'text');
+            const allAnswered = requiredQuestions.every(q => {
+                const val = formData[q.key];
+                return val !== undefined && val !== null && String(val).trim() !== '';
+            });
+            if (!allAnswered) {
+                triggerSnackbar(`Please answer all questions in ${formParts[i].label}.`);
                 return;
             }
         }
@@ -194,8 +256,9 @@ export function useFeedbackForm() {
             }]);
             if (error) throw error;
             setShowThankYou(true);
-        } catch {
-            alert('Could not submit evaluation.');
+        } catch (e) {
+            console.error('Evaluation submission error:', e);
+            triggerSnackbar(`Could not submit evaluation. ${e.message || ''}`);
         } finally {
             setSubmitting(false);
         }
@@ -206,14 +269,20 @@ export function useFeedbackForm() {
      */
     const resetForm = () => {
         setFormData({
-            firstName: '', lastName: '', sex: '', countryCode: '+63', contactNumber: '',
+            firstName: '', middleName: '', lastName: '', sex: '', email: '', birthdate: '', countryCode: '+63', contactNumber: '',
             clientType: 'Internal', officeUnitAddress: '', officeUnitOther: '',
             province: '', city: '', barangay: '',
             children: [{ name: '', age: '', sex: '' }],
             activities: '',
             dateOfUse: new Date().toISOString().split('T')[0], comments: '', serviceAvailed: ''
         });
-        setCurrentPart(0); setFlowType(null); setShowCoverPage(true); setShowThankYou(false); setCodeValidated(false); setUserCode('');
+        const isRegPath = window.location.pathname === '/registration';
+        setCurrentPart(0); 
+        setFlowType(isRegPath ? 'register' : null); 
+        setShowCoverPage(isRegPath ? false : true); 
+        setShowThankYou(false); 
+        setCodeValidated(false); 
+        setUserCode('');
     };
 
     return {
@@ -224,12 +293,17 @@ export function useFeedbackForm() {
         userCode,
         setUserCode,
         codeValidated,
+        setCodeValidated,
         generatedCode,
+        setGeneratedCode,
+        registrationId,
+        setRegistrationId,
         currentPart,
         setCurrentPart,
         showCoverPage,
         setShowCoverPage,
         showThankYou,
+        setShowThankYou,
         submitting,
         handleInputChange,
         handleChildChange,
@@ -239,6 +313,11 @@ export function useFeedbackForm() {
         validateUserCode,
         submitEvaluation,
         resetForm,
+        validateBasicInfo,
+        validateChildrenInfo,
         totalParts: formParts.length + 2,
+        snackbar,
+        setSnackbar,
+        triggerSnackbar,
     };
 }

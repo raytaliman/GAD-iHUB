@@ -6,6 +6,7 @@ const SPAN_CLASS = {
   1: 'lg:col-span-1',
   2: 'lg:col-span-2',
   3: 'lg:col-span-3',
+  4: 'lg:col-span-4',
 };
 
 /**

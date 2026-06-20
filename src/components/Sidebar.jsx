@@ -12,12 +12,14 @@ import {
   AlertTriangle,
   ScrollText,
   X,
+  UserCheck,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Overview', id: 'overview' },
-  { icon: Users, label: 'Respondents information', id: 'demographics' },
+  { icon: LayoutDashboard, label: 'Dashboard', id: 'overview' },
+  { icon: Users, label: 'Registrations', id: 'demographics' },
+  { icon: UserCheck, label: 'Visitors', id: 'visitors' },
   { icon: Building2, label: 'Evaluations', id: 'facility' },
   { icon: MessageSquare, label: 'Suggestions', id: 'suggestions' },
   { icon: ClipboardList, label: 'Form Management', id: 'form-management' },
@@ -201,50 +203,77 @@ export default function Sidebar({ activeView, onViewChange, onNavigateToUsers, o
   return (
     <>
       <aside
-        className="w-60 h-screen flex-shrink-0 overflow-hidden rounded-r-2xl flex flex-col border-r border-slate-200/80"
-        style={{ backgroundColor: '#EDE9FE', boxShadow: '4px 0 20px rgba(123,92,246,0.08)' }}
+        className="w-64 h-screen flex-shrink-0 overflow-hidden flex flex-col border-r border-violet-800/10 relative z-40 shadow-[4px_0_24px_rgba(112,48,160,0.15)]"
+        style={{ backgroundColor: '#7030a0' }}
       >
-        <div className="p-5 flex items-center">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Logo" className="h-16 w-auto" />
+
+        <div className="p-7 flex justify-center relative">
+          <div className="bg-white/95 backdrop-blur-md px-6 py-3.5 rounded-3xl shadow-[0_8px_32px_rgba(255,255,255,0.06)] border border-white/20 flex items-center justify-center hover:scale-[1.04] active:scale-[0.98] transition-all duration-300 group cursor-pointer">
+            <img src={logo} alt="Logo" className="h-12 w-auto group-hover:rotate-1 transition-transform duration-300" />
           </div>
         </div>
 
-        <nav className="flex-1 px-3 py-2 space-y-0.5">
-          {navItems.map(({ icon: Icon, label, id }) => (
-            <button
-              key={id}
-              onClick={() => onViewChange(id)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-full text-left transition-colors ${activeView === id
-                ? 'bg-primary text-white'
-                : 'text-slate-700 hover:bg-violet-100/80'
+        <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+          {navItems.map(({ icon: Icon, label, id }) => {
+            const isActive = activeView === id;
+            return (
+              <button
+                key={id}
+                onClick={() => onViewChange(id)}
+                className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-left transition-all duration-300 relative group overflow-hidden ${
+                  isActive
+                    ? 'bg-white/10 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_4px_20px_rgba(168,85,247,0.2)] border border-white/10 font-bold'
+                    : 'text-violet-200/80 hover:bg-white/5 hover:text-white border border-transparent'
                 }`}
-            >
-              <Icon size={20} strokeWidth={2} />
-              <span className="text-sm font-medium">{label}</span>
-            </button>
-          ))}
+              >
+                {/* Active Indicator Strip */}
+                {isActive && (
+                  <span className="absolute left-0 top-3 bottom-3 w-1 rounded-r-full bg-[#c084fc] shadow-[0_0_8px_#c084fc]" />
+                )}
+                
+                <Icon 
+                  size={18} 
+                  className={`transition-colors duration-300 ${
+                    isActive ? 'text-[#c084fc]' : 'text-violet-300 group-hover:text-white'
+                  }`}
+                  strokeWidth={isActive ? 2.5 : 2} 
+                />
+                <span className="text-xs font-bold tracking-wide">{label}</span>
+                
+                {/* Interactive background highlight */}
+                {!isActive && (
+                  <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/[0.02] to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                )}
+              </button>
+            );
+          })}
         </nav>
 
-        <div className="p-3 space-y-0.5 border-t border-slate-200/80">
+        <div className="p-4 space-y-2 border-t border-white/5 bg-black/10 backdrop-blur-sm">
           <button
             type="button"
             onClick={() => setSettingsModalOpen(true)}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-full text-left text-sm transition-all duration-200 ${settingsModalOpen
-              ? 'bg-violet-200/80 text-violet-900 shadow-sm'
-              : 'text-slate-700 hover:bg-violet-100/80 hover:text-violet-700 active:bg-violet-200/60 active:scale-[0.98]'
-              }`}
+            className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-left text-xs font-bold tracking-wide transition-all duration-300 relative group border ${
+              settingsModalOpen
+                ? 'bg-white/10 text-white border-white/10 shadow-inner'
+                : 'text-violet-200/80 border-transparent hover:bg-white/5 hover:text-white active:scale-[0.98]'
+            }`}
           >
-            <Settings size={18} />
-            Settings
+            <Settings 
+              size={16} 
+              className={`transition-transform duration-500 group-hover:rotate-45 ${
+                settingsModalOpen ? 'text-[#c084fc]' : 'text-violet-300 group-hover:text-white'
+              }`} 
+            />
+            <span>Settings</span>
           </button>
           <button
             type="button"
             onClick={() => setLogoutModalOpen(true)}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-full text-slate-700 hover:bg-violet-100/80 hover:text-violet-700 active:bg-violet-200/60 active:scale-[0.98] text-left text-sm transition-all duration-200"
+            className="w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-violet-200/80 hover:bg-red-500/10 hover:text-red-200 border border-transparent hover:border-red-500/20 active:scale-[0.98] text-left text-xs font-bold tracking-wide transition-all duration-300 group"
           >
-            <LogOut size={18} />
-            Log out
+            <LogOut size={16} className="text-violet-300 group-hover:text-red-400 transition-colors" />
+            <span>Log out</span>
           </button>
         </div>
       </aside>

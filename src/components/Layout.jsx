@@ -9,6 +9,7 @@ import FormManagement from '../pages/FormManagement';
 import GenerateReport from '../pages/GenerateReport';
 import Users from '../pages/Users';
 import SystemLogs from '../pages/SystemLogs';
+import Visitors from '../pages/Visitors';
 
 const STORAGE_KEY = 'csf-dashboard-widget-order';
 const ACTIVE_VIEW_KEY = 'csf-dashboard-active-view';
@@ -20,13 +21,17 @@ const ACTIVE_VIEW_KEY = 'csf-dashboard-active-view';
  * @returns {string[]} An array of widget IDs.
  */
 function loadWidgetOrder() {
-  const defaultOrder = ['kpis', 'chartTime', 'chartDonut', 'latest', 'byPart'];
+  const defaultOrder = ['kpis', 'chartTime', 'visitorsTime', 'byPart', 'topVisitors', 'latest'];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        return parsed.filter((id) => id !== 'chartPart2' && id !== 'chartPart3');
+        let order = parsed.filter((id) => id !== 'chartPart2' && id !== 'chartPart3' && id !== 'chartDonut');
+        // Ensure topVisitors and latest are positioned correctly (topVisitors before latest)
+        order = order.filter((id) => id !== 'topVisitors' && id !== 'latest');
+        order.push('topVisitors', 'latest');
+        return order;
       }
     }
   } catch (_) {}
@@ -43,7 +48,7 @@ function loadActiveView() {
   try {
     const saved = localStorage.getItem(ACTIVE_VIEW_KEY);
     if (saved && typeof saved === 'string') {
-      const validViews = ['overview', 'demographics', 'facility', 'suggestions', 'form-management', 'generate-report', 'users', 'system-logs'];
+      const validViews = ['overview', 'demographics', 'visitors', 'facility', 'suggestions', 'form-management', 'generate-report', 'users', 'system-logs'];
       if (validViews.includes(saved)) {
         return saved;
       }
@@ -64,8 +69,7 @@ function loadActiveView() {
  * @param {string} props.subtitle - Descriptive subtitle for the header.
  * @param {Function} props.onLogout - Callback function to handle system logout.
  */
-export default function Layout({ period, onPeriodChange, dateRange, onDateRangeChange, subtitle, onLogout }) {
-  const [activeView, setActiveViewState] = useState(() => loadActiveView());
+export default function Layout({ activeView, onViewChange, period, onPeriodChange, dateRange, onDateRangeChange, subtitle, onLogout }) {
   const [manageMode, setManageMode] = useState(false);
   const [widgetOrder, setWidgetOrder] = useState(() => loadWidgetOrder());
 
@@ -75,7 +79,7 @@ export default function Layout({ period, onPeriodChange, dateRange, onDateRangeC
    */
   const setActiveView = (view) => {
     if (view === activeView) return;
-    setActiveViewState(view);
+    onViewChange(view);
     try {
       localStorage.setItem(ACTIVE_VIEW_KEY, view);
     } catch (_) {}
@@ -95,9 +99,11 @@ export default function Layout({ period, onPeriodChange, dateRange, onDateRangeC
 
   const pageContent =
     activeView === 'demographics' ? (
-      <RespondentsInfo period={period} dateRange={dateRange} />
+      <RespondentsInfo />
+    ) : activeView === 'visitors' ? (
+      <Visitors />
     ) : activeView === 'facility' ? (
-      <FacilityAndService period={period} dateRange={dateRange} />
+      <FacilityAndService period={period} dateRange={dateRange} onViewChange={setActiveView} />
     ) : activeView === 'suggestions' ? (
       <Suggestions period={period} dateRange={dateRange} />
     ) : activeView === 'form-management' ? (
@@ -123,22 +129,26 @@ export default function Layout({ period, onPeriodChange, dateRange, onDateRangeC
     activeView === 'facility'
       ? 'Evaluations'
       : activeView === 'demographics'
-        ? 'Respondents information'
-        : activeView === 'suggestions'
-          ? 'Suggestions'
-          : activeView === 'form-management'
-            ? 'Form Management'
-            : activeView === 'generate-report'
-              ? 'Generate report'
-              : activeView === 'users'
-                ? 'User Management'
-                : activeView === 'system-logs'
-                  ? 'System Logs'
-                  : undefined;
-  const reportLikeViews = activeView === 'facility' || activeView === 'demographics' || activeView === 'suggestions' || activeView === 'form-management' || activeView === 'generate-report';
-  const headerSubtitle = reportLikeViews || activeView === 'users' || activeView === 'system-logs' ? '' : subtitle;
-  const headerHideControls = reportLikeViews || activeView === 'users' || activeView === 'system-logs';
-  const headerShowPeriodAndDate = reportLikeViews;
+        ? 'Registrations'
+        : activeView === 'visitors'
+          ? 'Visitors'
+          : activeView === 'suggestions'
+            ? 'Suggestions'
+            : activeView === 'form-management'
+              ? 'Form Management'
+              : activeView === 'generate-report'
+                ? 'Generate report'
+                : activeView === 'users'
+                  ? 'User Management'
+                  : activeView === 'system-logs'
+                    ? 'System Logs'
+                    : undefined;
+  const filterNeededViews = activeView === 'facility' || activeView === 'suggestions' || activeView === 'generate-report';
+  const allControlsHiddenViews = activeView === 'demographics' || activeView === 'visitors' || activeView === 'users' || activeView === 'system-logs' || activeView === 'form-management';
+  
+  const headerSubtitle = filterNeededViews || allControlsHiddenViews ? '' : subtitle;
+  const headerHideControls = filterNeededViews || allControlsHiddenViews;
+  const headerShowPeriodAndDate = filterNeededViews;
 
   return (
     <div className="flex h-screen overflow-hidden bg-white">

@@ -31,6 +31,16 @@ const RUN_RADIO_SQL_MESSAGE =
   'The radio button feature requires a database update.\n\n' +
   'Please run the SQL migration in "add_radio_options.sql" in your Supabase SQL Editor to enable this feature.';
 
+const RUN_SQL_MESSAGE =
+  'This action requires database setup. Please run the SQL migration setup in your Supabase SQL Editor.';
+
+const ANSWER_TYPE_OPTIONS = [
+  { value: 'emoji', label: 'Emoji scale', desc: 'Standard 1-to-5 smiley emoji rating selector.' },
+  { value: 'satisfaction', label: 'Satisfaction scale', desc: '5-level text satisfaction scale (Very Satisfied to Very Dissatisfied).' },
+  { value: 'text', label: 'Written feedback', desc: 'Free-form comment or suggestion input textbox.' },
+  { value: 'radio', label: 'Multiple choice', desc: 'Single-choice custom options list (comma separated).' }
+];
+
 /**
  * Normalizes a raw question object into a consistent internal format.
  * 
@@ -67,48 +77,93 @@ function useFormStructure() {
   /**
    * Loads form parts and questions from Supabase.
    */
-  const load = useCallback(async () => {
+  const load = useCallback(async (showSpinner = true) => {
     if (!supabase) {
       setParts(DEFAULT_PARTS.map((p) => ({ ...p, questions: p.questions.map((q) => norm({ ...q, part: p.key }, p.key)) })));
       setLoading(false);
       return;
     }
-    setLoading(true);
+    if (showSpinner) setLoading(true);
     setError(null);
-    const partsRes = await supabase.from('form_parts').select('id, key, sort_order, label').order('sort_order');
-    // Try to select options, if it fails, try without it
+
+    const seedDefaultStructure = async () => {
+      try {
+        const partsToInsert = DEFAULT_PARTS.map(p => ({
+          key: p.key,
+          sort_order: p.sort_order,
+          label: p.label
+        }));
+        const { error: partErr } = await supabase.from('form_parts').insert(partsToInsert);
+        if (partErr) throw partErr;
+
+        const questionsToInsert = DEFAULT_PARTS.flatMap(p => p.questions.map(q => ({
+          part: p.key,
+          sort_order: q.sort_order,
+          key: q.key,
+          label: q.label,
+          answer_type: q.answer_type ?? q.answerType ?? 'emoji',
+          options: q.options || null
+        })));
+        const { error: questErr } = await supabase.from('questions').insert(questionsToInsert);
+        if (questErr) throw questErr;
+
+        return true;
+      } catch (err) {
+        console.error('Failed to seed default form structure:', err);
+        return false;
+      }
+    };
+
+    let partsRes = await supabase.from('form_parts').select('id, key, sort_order, label').order('sort_order');
     let questionsRes = await supabase.from('questions').select('id, part, sort_order, key, label, answer_type, options').order('part').order('sort_order');
     if (questionsRes.error && questionsRes.error.code === '42703') {
       console.warn('options column missing, falling back to basic questions fetch');
       questionsRes = await supabase.from('questions').select('id, part, sort_order, key, label, answer_type').order('part').order('sort_order');
     }
+
     if (partsRes.error || questionsRes.error) {
       setError(partsRes.error?.message || questionsRes.error?.message);
       setParts(DEFAULT_PARTS.map((p) => ({ ...p, questions: p.questions.map((q) => norm({ ...q, part: p.key }, p.key)) })));
       setHasBackend(false);
     } else {
-      setHasBackend((partsRes.data?.length ?? 0) > 0 || (questionsRes.data?.length ?? 0) > 0);
-      const partRows = partsRes.data ?? [];
-      const questionRows = questionsRes.data ?? [];
-      const combined = partRows.length
-        ? partRows
-          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-          .map((p) => {
-            const qs = (questionRows || [])
+      let backendExists = (partsRes.data?.length ?? 0) > 0 || (questionsRes.data?.length ?? 0) > 0;
+      if (!backendExists) {
+        const seeded = await seedDefaultStructure();
+        if (seeded) {
+          partsRes = await supabase.from('form_parts').select('id, key, sort_order, label').order('sort_order');
+          questionsRes = await supabase.from('questions').select('id, part, sort_order, key, label, answer_type, options').order('part').order('sort_order');
+          if (questionsRes.error && questionsRes.error.code === '42703') {
+            questionsRes = await supabase.from('questions').select('id, part, sort_order, key, label, answer_type').order('part').order('sort_order');
+          }
+          backendExists = !partsRes.error && !questionsRes.error && ((partsRes.data?.length ?? 0) > 0 || (questionsRes.data?.length ?? 0) > 0);
+        }
+      }
+
+      setHasBackend(backendExists);
+      if (!backendExists) {
+        setParts(DEFAULT_PARTS.map((p) => ({ ...p, questions: p.questions.map((q) => norm({ ...q, part: p.key }, p.key)) })));
+      } else {
+        const partRows = partsRes.data ?? [];
+        const questionRows = questionsRes.data ?? [];
+        const combined = partRows.length
+          ? partRows
+            .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+            .map((p) => {
+              const qs = (questionRows || [])
+                .filter((q) => q.part === p.key)
+                .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+                .map((q) => norm(q, p.key));
+              return { id: p.id, key: p.key, label: p.label, sort_order: p.sort_order ?? 0, questions: qs };
+            })
+          : DEFAULT_PARTS.map((p) => ({
+            ...p,
+            questions: (questionRows || [])
               .filter((q) => q.part === p.key)
               .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-              .map((q) => norm(q, p.key));
-            return { id: p.id, key: p.key, label: p.label, sort_order: p.sort_order ?? 0, questions: qs };
-          })
-        : DEFAULT_PARTS.map((p) => ({
-          ...p,
-          questions: (questionRows || [])
-            .filter((q) => q.part === p.key)
-            .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-            .map((q) => norm(q, p.key)),
-        }));
-      if (combined.length === 0) setParts(DEFAULT_PARTS.map((p) => ({ ...p, questions: p.questions.map((q) => norm({ ...q, part: p.key }, p.key)) })));
-      else setParts(combined);
+              .map((q) => norm(q, p.key)),
+          }));
+        setParts(combined);
+      }
     }
     setLoading(false);
   }, []);
@@ -133,23 +188,23 @@ function useFormStructure() {
 function QuestionRow({ item, onEdit, onDelete, canEdit, canDelete, animationDelay = 0 }) {
   return (
     <div
-      className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-slate-50/80 animate-fade-in-up"
+      className="flex items-center gap-3 py-3 px-4 hover:bg-slate-50/40 transition-colors animate-fade-in-up"
       style={{
         animationDelay: `${animationDelay}ms`,
         animationFillMode: 'both',
       }}
     >
-      <span className="text-slate-400 text-sm w-6 flex-shrink-0">{item.sort_order + 1}.</span>
-      <span className="flex-1 text-slate-800">{item.label}</span>
-      <span className="text-slate-400 text-xs capitalize px-2 py-0.5 rounded bg-slate-100">{item.answer_type ?? 'emoji'}</span>
+      <span className="text-slate-400 text-xs font-bold w-6 flex-shrink-0">{item.sort_order + 1}.</span>
+      <span className="flex-1 text-slate-800 text-xs font-semibold leading-relaxed">{item.label}</span>
+      <span className="text-slate-400 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-50 border border-slate-100/80">{item.answer_type ?? 'emoji'}</span>
       {canEdit && (
         <button
           type="button"
           onClick={() => onEdit(item)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors border border-slate-200 hover:border-indigo-200 text-sm font-medium"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:bg-violet-50 hover:text-[#7030a0] transition-all border border-slate-200 hover:border-violet-200 text-xs font-bold shrink-0"
           aria-label="Edit"
         >
-          <Pencil size={16} />
+          <Pencil size={14} />
           Edit
         </button>
       )}
@@ -157,10 +212,10 @@ function QuestionRow({ item, onEdit, onDelete, canEdit, canDelete, animationDela
         <button
           type="button"
           onClick={() => onDelete(item)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors border border-slate-200 hover:border-red-200 text-sm font-medium"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-all border border-slate-200 hover:border-rose-200 text-xs font-bold shrink-0"
           aria-label="Delete"
         >
-          <Trash2 size={16} />
+          <Trash2 size={14} />
           Delete
         </button>
       )}
@@ -205,57 +260,59 @@ function PartSection({
 }) {
   const showingPartEdit = editingId === part.id;
   return (
-    <div className="bg-white rounded-2xl border border-black/10 shadow-card overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden animate-scale-in">
+      <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-3 bg-slate-50/20">
         {showingPartEdit ? (
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <input
               type="text"
               value={partEditLabel}
               onChange={(e) => onPartEditLabelChange(e.target.value)}
-              className="flex-1 min-w-0 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500"
+              className="flex-1 min-w-0 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-4 focus:ring-violet-100 focus:border-[#7030a0] transition-all bg-white"
               placeholder="Part title"
               autoFocus
             />
-            <button type="button" onClick={() => onSavePartEdit(part, partEditLabel)} className="p-2 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700">
-              <Save size={18} />
+            <button type="button" onClick={() => onSavePartEdit(part, partEditLabel)} className="p-2.5 rounded-xl text-white bg-gradient-to-r from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2783] active:scale-95 transition-all">
+              <Save size={16} />
             </button>
-            <button type="button" onClick={onCancelPartEdit} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100">
-              <X size={18} />
+            <button type="button" onClick={onCancelPartEdit} className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 active:scale-95 transition-all">
+              <X size={16} />
             </button>
           </div>
         ) : (
           <>
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <h3 className="font-semibold text-slate-800">{part.label}</h3>
-              <button
-                type="button"
-                onClick={() => onEditPart(part)}
-                className="flex items-center gap-1 px-2 py-1 rounded-lg text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 text-sm"
-                aria-label="Edit part title"
-              >
-                <Pencil size={14} />
-                Edit part
-              </button>
-              {isCustomPart && (
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <h3 className="font-bold text-slate-800 text-sm tracking-tight">{part.label}</h3>
+              <div className="flex items-center gap-1 flex-shrink-0">
                 <button
                   type="button"
-                  onClick={() => onDeletePart(part)}
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600 text-sm"
-                  aria-label="Delete part"
+                  onClick={() => onEditPart(part)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-500 hover:bg-violet-50 hover:text-[#7030a0] active:scale-95 transition-all text-xs font-bold"
+                  aria-label="Edit part title"
                 >
-                  <Trash2 size={14} />
-                  Delete part
+                  <Pencil size={13} />
+                  Rename
                 </button>
-              )}
+                {isCustomPart && (
+                  <button
+                    type="button"
+                    onClick={() => onDeletePart(part)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 active:scale-95 transition-all text-xs font-bold"
+                    aria-label="Delete part"
+                  >
+                    <Trash2 size={13} />
+                    Delete
+                  </button>
+                )}
+              </div>
             </div>
             <button
               type="button"
               onClick={() => onAddQuestion(part.key)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white transition-colors flex-shrink-0"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all duration-200 hover:shadow-md hover:shadow-violet-200 active:scale-95 shrink-0"
               style={{ backgroundColor: '#7030a0' }}
             >
-              <Plus size={18} />
+              <Plus size={16} />
               Add question
             </button>
           </>
@@ -341,7 +398,7 @@ export default function FormManagement() {
     if (err) return;
     addLog({ action: 'edit', target: 'Question', details: `Question "${(label ?? '').trim()}" in part ${item.part}` });
     startEdit(null);
-    reload();
+    reload(false);
   };
 
   /**
@@ -355,7 +412,7 @@ export default function FormManagement() {
     if (err) return;
     addLog({ action: 'delete', target: 'Question', details: `Question "${item.label}" (${item.id})` });
     startEdit(null);
-    reload();
+    reload(false);
   };
 
   const requestDeleteQuestion = (item) => {
@@ -408,7 +465,7 @@ export default function FormManagement() {
     setNewQuestionLabel('');
     setNewQuestionAnswerType('emoji');
     setNewQuestionOptions('');
-    reload();
+    reload(false);
   };
 
   const nextPartKey = () => {
@@ -445,7 +502,7 @@ export default function FormManagement() {
     addLog({ action: 'add', target: 'Form part', details: `Part "${label}" (${key})` });
     setAddPartModal(false);
     setNewPartLabel('');
-    reload();
+    reload(false);
   };
 
   const isCustomPart = (part) => {
@@ -484,7 +541,7 @@ export default function FormManagement() {
     }
     addLog({ action: 'edit', target: 'Form part', details: `Part "${(label || '').trim()}" (${part.key})` });
     cancelPartEdit();
-    reload();
+    reload(false);
   };
 
   const deletePart = async (part) => {
@@ -496,7 +553,7 @@ export default function FormManagement() {
     if (err) return;
     addLog({ action: 'delete', target: 'Form part', details: `Part "${part.label}" (${part.key})` });
     cancelPartEdit();
-    reload();
+    reload(false);
   };
 
   const requestDeletePart = (part) => {
@@ -522,25 +579,25 @@ export default function FormManagement() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-2xl p-6 border border-black/25 shadow-card">
-        <h2 className="font-semibold text-slate-800 mb-1">Form Management</h2>
-        <p className="text-slate-500 text-sm">
+    <div className="space-y-6 animate-fade-in">
+      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+        <h2 className="font-black text-slate-800 text-lg tracking-tight mb-1.5">Form Management</h2>
+        <p className="text-slate-500 text-xs font-semibold leading-relaxed">
           Manage parts (sections) and questions shown in the mobile app. You can add or remove parts, edit part titles, and add, edit, or remove questions in each part.
         </p>
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-            {error}. Using built-in structure. Run <code className="bg-amber-100 px-1 rounded">supabase_setup.sql</code> in the Supabase SQL Editor to enable saving and adding parts.
+          <div className="mt-4 p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 text-amber-800 text-xs font-semibold leading-relaxed">
+            {error}. Using built-in structure. Run <code className="bg-amber-100/50 px-1.5 py-0.5 rounded font-mono">supabase_setup.sql</code> in the Supabase SQL Editor to enable saving and adding parts.
           </div>
         )}
         <div className="mt-4">
           <button
             type="button"
             onClick={() => { setAddPartModal(true); setNewPartLabel(''); }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all duration-200 hover:shadow-md hover:shadow-violet-200 active:scale-95"
             style={{ backgroundColor: '#7030a0' }}
           >
-            <LayoutList size={18} />
+            <LayoutList size={16} />
             Add part
           </button>
         </div>

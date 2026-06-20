@@ -15,34 +15,34 @@ function ViewSuggestionModal({ suggestion, onClose }) {
   if (!suggestion) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="View full suggestion"
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col border border-slate-200 animate-scale-in"
+        className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col border border-slate-100 animate-scale-in overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 p-6 border-b border-slate-200 bg-gradient-to-r from-primary/5 to-primary/10">
+        <div className="flex items-center justify-between gap-4 p-6 border-b border-slate-100 bg-gradient-to-r from-violet-50/50 to-violet-100/20">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-primary/10">
-              <MessageSquare className="text-primary" size={20} />
+            <div className="p-2.5 rounded-2xl bg-violet-100/50 flex items-center justify-center text-[#7030a0]">
+              <MessageSquare size={20} />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-800 text-lg">Suggestion Details</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Full feedback and information</p>
+              <h3 className="font-black text-slate-800 text-lg tracking-tight">Suggestion Details</h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Full feedback and information</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 rounded-lg transition-all duration-200"
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 rounded-xl transition-all duration-200"
             aria-label="Close"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
@@ -51,37 +51,37 @@ function ViewSuggestionModal({ suggestion, onClose }) {
           <div className="space-y-5">
             {/* Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100/80">
                 <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="text-primary" size={16} />
-                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Submitted Date</span>
+                  <Calendar className="text-[#7030a0]" size={15} />
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Submitted Date</span>
                 </div>
-                <p className="text-sm font-semibold text-slate-800">{suggestion.submittedFormatted || '–'}</p>
+                <p className="text-sm font-bold text-slate-800">{suggestion.submittedFormatted || '–'}</p>
               </div>
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100/80">
                 <div className="flex items-center gap-2 mb-2">
-                  <Building2 className="text-primary" size={16} />
-                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Office / Unit</span>
+                  <Building2 className="text-[#7030a0]" size={15} />
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Office / Unit</span>
                 </div>
-                <p className="text-sm font-semibold text-slate-800">{suggestion.officeDisplay || '–'}</p>
+                <p className="text-sm font-bold text-slate-800">{suggestion.officeDisplay || '–'}</p>
               </div>
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100/80">
                 <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="text-primary" size={16} />
-                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Date of Use</span>
+                  <Calendar className="text-[#7030a0]" size={15} />
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date Registered</span>
                 </div>
-                <p className="text-sm font-semibold text-slate-800">{suggestion.dateOfUseFormatted || '–'}</p>
+                <p className="text-sm font-bold text-slate-800">{suggestion.dateOfUseFormatted || '–'}</p>
               </div>
             </div>
 
             {/* Suggestion Content */}
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-5 border border-primary/20">
+            <div className="bg-gradient-to-br from-violet-50/20 to-violet-100/10 rounded-2xl p-5 border border-violet-100/80">
               <div className="flex items-center gap-2 mb-3">
-                <MessageSquare className="text-primary" size={18} />
-                <h4 className="font-semibold text-slate-800">Suggestion</h4>
+                <MessageSquare className="text-[#7030a0]" size={18} />
+                <h4 className="font-bold text-slate-800 tracking-tight">Suggestion</h4>
               </div>
-              <div className="bg-white rounded-lg p-4 border border-slate-200">
-                <p className="text-slate-700 whitespace-pre-wrap break-words leading-relaxed">
+              <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
+                <p className="text-slate-700 text-xs font-semibold whitespace-pre-wrap break-words leading-relaxed">
                   {suggestion.comments || '–'}
                 </p>
               </div>
@@ -227,35 +227,38 @@ export default function Suggestions({ period, dateRange }) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-2xl p-6 border border-black/25 shadow-card">
-        <div className="flex flex-wrap items-center gap-3 mb-4">
-          <h2 className="font-semibold text-slate-800">Suggestions for improvement</h2>
+    <div className="space-y-6 animate-fade-in">
+      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
+          <div>
+            <h2 className="font-black text-slate-800 text-lg tracking-tight">Suggestions for improvement</h2>
+            <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-0.5">Written suggestions collected from Part IV</p>
+          </div>
           <div className="relative ml-auto flex-1 min-w-[300px] max-w-xl">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by date, office, or suggestion"
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              placeholder="Search by date, office, or suggestion..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-violet-100 focus:border-[#7030a0] bg-slate-50/40 focus:bg-white transition-all duration-200"
             />
           </div>
           {search.trim() && (
-            <span className="text-slate-500 text-sm">
-              {filtered.length} of {rows.length} result{filtered.length !== 1 ? 's' : ''}
+            <span className="text-slate-400 text-xs font-bold uppercase tracking-wider bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-full shrink-0">
+              {filtered.length} of {rows.length} matches
             </span>
           )}
         </div>
         {loading ? (
-          <div className="h-48 flex items-center justify-center text-slate-400">Loading…</div>
+          <div className="h-48 flex items-center justify-center text-slate-400 font-semibold text-sm">Loading suggestions...</div>
         ) : !rows.length ? (
-          <div className="h-48 flex items-center justify-center text-slate-400 text-sm">
+          <div className="h-48 flex items-center justify-center text-slate-400 text-xs font-semibold">
             No suggestions in this period
           </div>
         ) : !filtered.length ? (
-          <div className="h-48 flex items-center justify-center text-slate-400 text-sm">
-            No matches for &quot;{search.trim()}&quot;
+          <div className="h-48 flex items-center justify-center text-slate-400 text-xs font-semibold">
+            No matches found for &quot;{search.trim()}&quot;
           </div>
         ) : (
           <>
@@ -263,48 +266,48 @@ export default function Suggestions({ period, dateRange }) {
               key={page}
               className={`transition-opacity duration-300 ${isPageTransitioning ? 'opacity-0' : 'opacity-100'}`}
             >
-              <div className="rounded-xl border border-slate-100">
+              <div className="rounded-2xl border border-slate-100 overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-slate-50/80 text-slate-600 border-b-2 border-slate-200">
-                      <th className="py-3.5 px-3 font-semibold text-center w-[140px]">Date</th>
-                      <th className="py-3.5 px-3 font-semibold text-center w-[220px]">Office / unit</th>
-                      <th className="py-3.5 px-3 font-semibold text-center w-[140px]">Date of use</th>
-                      <th className="py-3.5 px-3 font-semibold text-center w-[280px]">Suggestion</th>
-                      <th className="py-3.5 px-3 font-semibold text-center w-[120px]">Action</th>
+                    <tr className="bg-slate-50/50 text-slate-400 border-b border-slate-100 text-[10px] font-black uppercase tracking-wider">
+                      <th className="py-3.5 px-4 font-semibold text-center w-[140px]">Date</th>
+                      <th className="py-3.5 px-4 font-semibold text-left w-[220px]">Office / unit</th>
+                      <th className="py-3.5 px-4 font-semibold text-center w-[140px]">Date Registered</th>
+                      <th className="py-3.5 px-4 font-semibold text-left w-[280px]">Suggestion</th>
+                      <th className="py-3.5 px-4 font-semibold text-center w-[120px]">Action</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-slate-50">
                     {pageRows.map((r, index) => (
                       <tr
                         key={r.id}
-                        className="border-b border-slate-50 hover:bg-slate-50/50 animate-fade-in-up"
+                        className="hover:bg-slate-50/50 transition-colors animate-fade-in-up"
                         style={{
                           animationDelay: `${index * 50}ms`,
                           animationFillMode: 'both',
                         }}
                       >
-                        <td className="py-3 px-3 text-slate-600 whitespace-nowrap text-center w-[140px]">{r.submittedFormatted}</td>
-                        <td className="py-3 px-3 text-slate-600 w-[220px]">{r.officeDisplay}</td>
-                        <td className="py-3 px-3 text-slate-600 whitespace-nowrap text-center w-[140px]">{r.dateOfUseFormatted}</td>
-                        <td className="py-3 px-3 text-slate-700 w-[280px]">
+                        <td className="py-3.5 px-4 text-slate-500 font-medium text-xs whitespace-nowrap text-center w-[140px]">{r.submittedFormatted}</td>
+                        <td className="py-3.5 px-4 text-slate-700 font-semibold text-xs w-[220px]">{r.officeDisplay}</td>
+                        <td className="py-3.5 px-4 text-slate-500 font-medium text-xs whitespace-nowrap text-center w-[140px]">{r.dateOfUseFormatted}</td>
+                        <td className="py-3.5 px-4 text-slate-600 text-xs w-[280px] leading-relaxed">
                           {r.comments && r.comments.length > 25 ? (
                             <span>{r.comments.slice(0, 25)}...</span>
                           ) : (
                             r.comments || '–'
                           )}
                         </td>
-                        <td className="py-3 px-3 text-center w-[120px]">
+                        <td className="py-3.5 px-4 text-center w-[120px]">
                           {r.comments && r.comments.length > 25 ? (
                             <button
                               type="button"
                               onClick={() => setViewingSuggestion(r)}
-                              className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 hover:shadow-sm transition-all duration-200"
+                              className="px-3 py-1.5 rounded-xl bg-violet-50 text-[#7030a0] text-[11px] font-bold hover:bg-violet-100/70 active:scale-95 transition-all duration-200"
                             >
-                              View more
+                              View details
                             </button>
                           ) : (
-                            <span className="text-slate-400 text-xs">–</span>
+                            <span className="text-slate-400 text-xs font-semibold">–</span>
                           )}
                         </td>
                       </tr>
@@ -314,22 +317,22 @@ export default function Suggestions({ period, dateRange }) {
               </div>
             </div>
             {totalPages > 1 && (
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-100 mt-4">
-                <p className="text-slate-500 text-sm">
-                  Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filtered.length)} of {filtered.length}
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-100 mt-5">
+                <p className="text-slate-400 text-xs font-semibold">
+                  Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filtered.length)} of {filtered.length} entries
                 </p>
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
                     onClick={() => handlePageChange(Math.max(1, page - 1))}
                     disabled={page <= 1}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition-all duration-200"
                     aria-label="Previous page"
                   >
-                    <ChevronLeft size={18} />
+                    <ChevronLeft size={16} />
                     <span>Previous</span>
                   </button>
-                  <div className="flex items-center gap-0.5 mx-1">
+                  <div className="flex items-center gap-1 mx-1">
                     {Array.from({ length: totalPages }, (_, i) => i + 1)
                       .filter((p) => {
                         if (totalPages <= 7) return true;
@@ -344,7 +347,7 @@ export default function Suggestions({ period, dateRange }) {
                       }, [])
                       .map((p, idx) =>
                         p === '…' ? (
-                          <span key={`ellipsis-${idx}`} className="px-2 py-1 text-slate-400 text-sm">
+                          <span key={`ellipsis-${idx}`} className="px-2 py-1 text-slate-400 text-xs font-bold">
                             …
                           </span>
                         ) : (
@@ -352,8 +355,8 @@ export default function Suggestions({ period, dateRange }) {
                             key={p}
                             type="button"
                             onClick={() => handlePageChange(p)}
-                            className={`min-w-[2rem] h-8 px-2 rounded-lg text-sm font-medium transition-colors ${page === p
-                                ? 'bg-primary text-white shadow-sm'
+                            className={`min-w-[2rem] h-8 px-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${page === p
+                                ? 'bg-gradient-to-r from-violet-600 to-[#7030a0] text-white shadow-md shadow-violet-200'
                                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
                               }`}
                           >
@@ -366,11 +369,11 @@ export default function Suggestions({ period, dateRange }) {
                     type="button"
                     onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
                     disabled={page >= totalPages}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition-all duration-200"
                     aria-label="Next page"
                   >
                     <span>Next</span>
-                    <ChevronRight size={18} />
+                    <ChevronRight size={16} />
                   </button>
                 </div>
               </div>

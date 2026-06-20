@@ -82,7 +82,7 @@ INSERT INTO public.basic_info_fields (key, sort_order, label, field_type, requir
 ('barangay', 10, 'Barangay', 'text', false),
 ('service_availed', 11, 'Service Availed', 'text', false),
 ('activities', 12, 'Activities/Nature of Visit', 'text', false),
-('date_of_use', 13, 'Date of Use', 'date', false)
+('date_of_use', 13, 'Date of Visit', 'date', false)
 ON CONFLICT (key) DO UPDATE SET
   sort_order = EXCLUDED.sort_order,
   label = EXCLUDED.label,

@@ -22,7 +22,7 @@ export default function ChartSexDistribution({ data }) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-6 border border-black/25 shadow-card">
+      <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
         <h3 className="font-semibold text-slate-800 mb-4">Sex Distribution</h3>
         <div className="text-slate-400 text-sm py-4 text-center italic">Awaiting registration data...</div>
       </div>
@@ -131,7 +131,7 @@ export default function ChartSexDistribution({ data }) {
   const children = categories.slice(2, 4);
 
   return (
-    <div className="bg-white rounded-2xl p-4 border border-black/25 shadow-card h-full overflow-hidden flex flex-col">
+    <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm h-full overflow-hidden flex flex-col">
       <div className="flex items-center justify-between mb-3 px-1">
         <h3 className="font-bold text-slate-800 text-sm">Sex Distribution</h3>
         <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">

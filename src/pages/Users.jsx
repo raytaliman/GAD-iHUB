@@ -46,38 +46,38 @@ function ConfirmEditModal({ isOpen, user, editData, onConfirm, onCancel }) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in"
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
       aria-label="Confirm edit"
     >
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200"
+        className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 border border-slate-100 animate-scale-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-4 mb-4">
-          <h3 className="font-semibold text-slate-800 text-lg">Confirm Changes</h3>
+          <h3 className="font-black text-slate-800 text-lg tracking-tight">Confirm Changes</h3>
           <button
             type="button"
             onClick={onCancel}
-            className="text-slate-500 hover:text-slate-700 p-1 rounded transition-colors"
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-50 p-1.5 rounded-xl transition-all"
             aria-label="Close"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
         <div className="mb-6">
-          <p className="text-slate-600 mb-3">
+          <p className="text-slate-600 text-xs font-semibold leading-relaxed mb-4">
             Are you sure you want to save the following changes for user{' '}
-            <span className="font-semibold text-slate-800">{user.username}</span>?
+            <span className="font-black text-[#7030a0]">{user.username}</span>?
           </p>
           {hasChanges() && (
-            <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
-              <ul className="text-sm text-slate-700 space-y-1.5">
+            <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100">
+              <ul className="text-xs font-bold text-slate-600 space-y-2">
                 {getChanges().map((change, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-slate-400 mt-0.5">•</span>
+                  <li key={idx} className="flex items-start gap-2.5">
+                    <span className="text-[#7030a0] mt-0.5">•</span>
                     <span>{change}</span>
                   </li>
                 ))}
@@ -85,21 +85,20 @@ function ConfirmEditModal({ isOpen, user, editData, onConfirm, onCancel }) {
             </div>
           )}
         </div>
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2.5">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-xs font-bold transition-all"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="px-4 py-2 rounded-xl text-white transition-colors flex items-center gap-2"
-            style={{ backgroundColor: '#7030a0' }}
+            className="px-4 py-2 rounded-xl text-white text-xs font-bold bg-[#7030a0] hover:bg-[#5b2783] active:scale-95 transition-all flex items-center gap-2"
           >
-            <Save size={16} />
+            <Save size={14} />
             Confirm Save
           </button>
         </div>
@@ -110,13 +109,6 @@ function ConfirmEditModal({ isOpen, user, editData, onConfirm, onCancel }) {
 
 /**
  * Modal component that displays detailed user information and provides inline editing capabilities.
- * 
- * @param {Object} props
- * @param {boolean} props.isOpen - Visibility flag.
- * @param {Object} props.user - The user object to view/edit.
- * @param {Function} props.onClose - Callback to close the modal.
- * @param {Function} props.onEdit - Callback to persist edits.
- * @param {boolean} props.saving - API loading state for the save button.
  */
 function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, saving }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -165,38 +157,38 @@ function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, savin
     });
   };
 
-  const rowClass = 'flex justify-between items-start gap-4 py-3 border-b border-slate-100 last:border-0';
-  const labelClass = 'text-xs font-medium text-slate-500 uppercase tracking-wide shrink-0 w-28';
-  const valueClass = 'text-sm text-slate-800 text-right break-all';
+  const rowClass = 'flex justify-between items-center gap-4 py-3.5 border-b border-slate-50 last:border-0';
+  const labelClass = 'text-[10px] font-black text-slate-400 uppercase tracking-wider shrink-0 w-28';
+  const valueClass = 'text-xs text-slate-700 font-bold text-right break-all';
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="View user details"
     >
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200"
+        className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 border border-slate-100 animate-scale-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
-          <h3 className="font-semibold text-slate-900 text-lg">{isEditing ? 'Edit User' : 'User Details'}</h3>
+          <h3 className="font-black text-slate-800 text-lg tracking-tight">{isEditing ? 'Edit User' : 'User Details'}</h3>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1.5 rounded-lg transition-colors"
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-50 p-1.5 rounded-xl transition-all"
             aria-label="Close"
           >
             <X size={18} />
           </button>
         </div>
 
-        <div className="space-y-0 divide-y divide-slate-100">
+        <div className="space-y-0 divide-y divide-slate-50">
           <div className={rowClass}>
             <span className={labelClass}>User ID</span>
-            <span className="font-mono text-xs text-slate-500 text-right break-all">{user.id}</span>
+            <span className="font-mono text-[10px] font-bold text-slate-400 text-right break-all uppercase">{user.id}</span>
           </div>
           <div className={rowClass}>
             <span className={labelClass}>User Name</span>
@@ -205,7 +197,7 @@ function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, savin
                 type="text"
                 value={editData.username}
                 onChange={(e) => setEditData({ ...editData, username: e.target.value })}
-                className="flex-1 max-w-[200px] border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="flex-1 max-w-[200px] border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all"
                 placeholder="Username"
                 required
               />
@@ -220,7 +212,7 @@ function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, savin
                 type="email"
                 value={editData.email}
                 onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                className="flex-1 max-w-[200px] border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="flex-1 max-w-[200px] border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all"
                 placeholder="Email"
                 required
               />
@@ -242,13 +234,15 @@ function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, savin
               <select
                 value={editData.user_level}
                 onChange={(e) => setEditData({ ...editData, user_level: e.target.value })}
-                className="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all"
               >
                 <option value="assistant">Assistant</option>
                 <option value="admin">Admin</option>
               </select>
             ) : (
-              <span className={valueClass + ' capitalize'}>{user.user_level || 'assistant'}</span>
+              <span className="inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-violet-50 text-[#7030a0] border border-violet-100/50">
+                {user.user_level || 'assistant'}
+              </span>
             )}
           </div>
           <div className={rowClass}>
@@ -257,15 +251,17 @@ function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, savin
               <select
                 value={editData.is_active ? 'active' : 'inactive'}
                 onChange={(e) => setEditData({ ...editData, is_active: e.target.value === 'active' })}
-                className="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
             ) : (
               <span
-                className={`inline-block px-2 py-0.5 rounded-md text-xs font-medium ${
-                  user.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                  user.is_active
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-100/50'
+                    : 'bg-rose-50 text-rose-700 border border-rose-100/50'
                 }`}
               >
                 {user.is_active ? 'Active' : 'Inactive'}
@@ -274,14 +270,14 @@ function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, savin
           </div>
         </div>
 
-        <div className="mt-6 pt-4 flex justify-end gap-2 border-t border-slate-100">
+        <div className="mt-6 pt-4 flex justify-end gap-2.5 border-t border-slate-50">
           {isEditing ? (
             <>
               <button
                 type="button"
                 onClick={handleCancel}
                 disabled={saving}
-                className="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors text-sm font-medium disabled:opacity-50"
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-all text-xs font-bold disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -289,8 +285,7 @@ function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, savin
                 type="button"
                 onClick={handleSave}
                 disabled={saving || !editData.username || !editData.email}
-                className="px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                style={{ backgroundColor: '#7030a0' }}
+                className="px-4 py-2 rounded-xl text-white text-xs font-bold bg-[#7030a0] hover:bg-[#5b2783] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 <Save size={14} />
                 {saving ? 'Saving...' : 'Save'}
@@ -301,15 +296,14 @@ function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, savin
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors text-sm font-medium"
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-all text-xs font-bold"
               >
                 Close
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors flex items-center gap-2 hover:opacity-90"
-                style={{ backgroundColor: '#7030a0' }}
+                className="px-4 py-2 rounded-xl text-white text-xs font-bold bg-[#7030a0] hover:bg-[#5b2783] transition-all flex items-center gap-2 active:scale-95"
               >
                 <Pencil size={14} />
                 Edit
@@ -331,13 +325,6 @@ function ViewDetailsModal({ isOpen, user, onClose, onStatusChange, onEdit, savin
 
 /**
  * Modal component for creating a new user.
- * Performs validation on password strength and confirmation before allowing submission.
- * 
- * @param {Object} props
- * @param {boolean} props.isOpen - Visibility flag.
- * @param {Function} props.onClose - Callback to close the modal and reset state.
- * @param {Function} props.onSubmit - Callback to create the user in the backend.
- * @param {boolean} props.saving - API loading state.
  */
 function AddUserModal({ isOpen, onClose, onSubmit, saving }) {
   const [formData, setFormData] = useState({
@@ -350,11 +337,6 @@ function AddUserModal({ isOpen, onClose, onSubmit, saving }) {
   });
   const [passwordErrors, setPasswordErrors] = useState([]);
 
-  /**
-   * Checks password against complexity requirements:
-   * 8+ chars, lowercase, uppercase, and a number.
-   * @private
-   */
   const validatePassword = (password) => {
     const errors = [];
     if (password.length < 8) {
@@ -427,133 +409,134 @@ function AddUserModal({ isOpen, onClose, onSubmit, saving }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-label="Add user"
     >
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200"
+        className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 border border-slate-100 animate-scale-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h3 className="font-semibold text-slate-800 text-lg">Add User</h3>
+          <h3 className="font-black text-slate-800 text-lg tracking-tight">Add User</h3>
           <button
             type="button"
             onClick={handleClose}
-            className="text-slate-500 hover:text-slate-700 p-1 rounded transition-colors"
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-50 p-1.5 rounded-xl transition-all"
             aria-label="Close"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">User Name</label>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">User Name</label>
             <input
               type="text"
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all placeholder:text-slate-300"
               placeholder="Enter username"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Email Address</label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all placeholder:text-slate-300"
               placeholder="Enter email"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Password</label>
             <input
               type="password"
               value={formData.password}
               onChange={(e) => handlePasswordChange(e.target.value)}
-              className={`w-full border rounded-lg px-4 py-2.5 text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary ${
+              className={`w-full border rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all placeholder:text-slate-300 ${
                 formData.password && passwordErrors.length > 0
-                  ? 'border-red-300 focus:border-red-500'
-                  : 'border-slate-300'
+                  ? 'border-rose-200 focus:ring-rose-50 focus:border-rose-500'
+                  : 'border-slate-200'
               }`}
-              placeholder="Enter password (min 8 chars, mixed case, number)"
+              placeholder="Min 8 chars, mixed case, number"
               required
             />
             {formData.password && passwordErrors.length > 0 && (
-              <ul className="mt-1.5 text-xs text-red-600 space-y-0.5">
+              <ul className="mt-2 text-[10px] font-bold text-rose-600 space-y-0.5">
                 {passwordErrors.map((error, idx) => (
                   <li key={idx}>• {error}</li>
                 ))}
               </ul>
             )}
             {formData.password && passwordErrors.length === 0 && formData.password.length >= 8 && (
-              <p className="mt-1.5 text-xs text-emerald-600">✓ Password meets all requirements</p>
+              <p className="mt-2 text-[10px] font-bold text-emerald-600">✓ Password meets all requirements</p>
             )}
             {!formData.password && (
-              <p className="mt-1.5 text-xs text-slate-500">
+              <p className="mt-1.5 text-[10px] font-semibold text-slate-400">
                 Password must be at least 8 characters with uppercase, lowercase, and a number
               </p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Confirm Password</label>
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Confirm Password</label>
             <input
               type="password"
               value={formData.confirmPassword}
               onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-              className={`w-full border rounded-lg px-4 py-2.5 text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary ${
+              className={`w-full border rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all placeholder:text-slate-300 ${
                 formData.confirmPassword && formData.password !== formData.confirmPassword
-                  ? 'border-red-300 focus:border-red-500'
-                  : 'border-slate-300'
+                  ? 'border-rose-200 focus:ring-rose-50 focus:border-rose-500'
+                  : 'border-slate-200'
               }`}
               placeholder="Confirm password"
               required
             />
             {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-              <p className="mt-1.5 text-xs text-red-600">• Passwords do not match</p>
+              <p className="mt-2 text-[10px] font-bold text-rose-600">• Passwords do not match</p>
             )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">User Level</label>
-            <select
-              value={formData.user_level}
-              onChange={(e) => setFormData({ ...formData, user_level: e.target.value })}
-              className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
-            >
-              <option value="assistant">Assistant</option>
-              <option value="admin">Admin</option>
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">User Level</label>
+              <select
+                value={formData.user_level}
+                onChange={(e) => setFormData({ ...formData, user_level: e.target.value })}
+                className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all"
+              >
+                <option value="assistant">Assistant</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Status</label>
+              <select
+                value={formData.is_active ? 'active' : 'inactive'}
+                onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'active' })}
+                className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-[#7030a0] transition-all"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
-            <select
-              value={formData.is_active ? 'active' : 'inactive'}
-              onChange={(e) => setFormData({ ...formData, is_active: e.target.value === 'active' })}
-              className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2.5 pt-4 border-t border-slate-50">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
+              className="px-4 py-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-xs font-bold transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || !formData.username || !formData.email || !isPasswordValid}
-              className="px-4 py-2 rounded-xl text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: '#7030a0' }}
+              className="px-4 py-2 rounded-xl text-white text-xs font-bold bg-[#7030a0] hover:bg-[#5b2783] transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
             >
               {saving ? 'Adding...' : 'Add User'}
             </button>
@@ -566,61 +549,54 @@ function AddUserModal({ isOpen, onClose, onSubmit, saving }) {
 
 /**
  * Modal component for confirming the toggling of a user's active status.
- * 
- * @param {Object} props
- * @param {boolean} props.isOpen - Visibility flag.
- * @param {Object} props.user - The user being updated.
- * @param {boolean} props.newStatus - The target status (true = active).
- * @param {Function} props.onConfirm - Callback to persist status.
- * @param {Function} props.onCancel - Callback to close the modal.
  */
 function ConfirmStatusModal({ isOpen, user, newStatus, onConfirm, onCancel }) {
   if (!isOpen || !user) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in"
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
       aria-label="Confirm status change"
     >
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200"
+        className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 border border-slate-100 animate-scale-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-4 mb-4">
-          <h3 className="font-semibold text-slate-800 text-lg">
+          <h3 className="font-black text-slate-800 text-lg tracking-tight">
             {newStatus ? 'Activate User' : 'Deactivate User'}
           </h3>
           <button
             type="button"
             onClick={onCancel}
-            className="text-slate-500 hover:text-slate-700 p-1 rounded transition-colors"
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-50 p-1.5 rounded-xl transition-all"
             aria-label="Close"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
-        <p className="text-slate-600 mb-6">
+        <p className="text-slate-600 text-xs font-semibold leading-relaxed mb-6">
           Are you sure you want to {newStatus ? 'activate' : 'deactivate'} the user{' '}
-          <span className="font-semibold text-slate-800">{user.username}</span>?
+          <span className="font-black text-[#7030a0]">{user.username}</span>?
         </p>
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2.5">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-xs font-bold transition-all"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-xl text-white transition-colors ${
+            className={`px-4 py-2 rounded-xl text-white text-xs font-bold transition-all active:scale-95 ${
               newStatus
                 ? 'bg-emerald-600 hover:bg-emerald-700'
-                : 'bg-red-600 hover:bg-red-700'
+                : 'bg-rose-600 hover:bg-rose-755'
             }`}
           >
             {newStatus ? 'Activate' : 'Deactivate'}
@@ -630,6 +606,7 @@ function ConfirmStatusModal({ isOpen, user, newStatus, onConfirm, onCancel }) {
     </div>
   );
 }
+
 
 /**
  * Page component that manages the dashboard's administrative users.
@@ -928,91 +905,90 @@ export default function Users() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-2xl p-6 border border-black/25 shadow-card">
-        <div className="flex items-center justify-between mb-4">
+    <div className="space-y-6 animate-fade-in">
+      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+        <div className="flex items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="font-semibold text-slate-800 text-lg">Users</h2>
-            <p className="text-slate-500 text-sm mt-1">Manage user accounts and permissions</p>
+            <h2 className="font-black text-slate-800 text-lg tracking-tight">Users</h2>
+            <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-0.5">Manage user accounts and permission roles</p>
           </div>
           <button
             type="button"
             onClick={() => setAddUserModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white transition-colors hover:opacity-90"
-            style={{ backgroundColor: '#7030a0' }}
+            className="flex items-center gap-2 px-4.5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2783] hover:shadow-lg hover:shadow-violet-200/50 transition-all duration-200 active:scale-95 shrink-0"
           >
-            <UserPlus size={18} />
+            <UserPlus size={16} />
             Add User
           </button>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+          <div className="mb-4 p-3.5 rounded-2xl bg-amber-50/55 border border-amber-100 text-amber-800 text-xs font-semibold leading-relaxed">
             {error}. Note: You may need to create a users table in Supabase or use the Admin API to fetch users.
           </div>
         )}
 
         {loading ? (
-          <div className="h-48 flex items-center justify-center text-slate-400">Loading users…</div>
+          <div className="h-48 flex items-center justify-center text-slate-400 font-semibold text-sm">Loading users...</div>
         ) : users.length === 0 ? (
-          <div className="h-48 flex items-center justify-center text-slate-400 text-sm">
+          <div className="h-48 flex items-center justify-center text-slate-400 text-xs font-semibold">
             No users found. Click &quot;Add User&quot; to create a new account.
           </div>
         ) : (
-          <div className="rounded-xl border border-slate-100 overflow-x-auto">
+          <div className="rounded-2xl border border-slate-100 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left bg-slate-50/80 text-slate-600 border-b-2 border-slate-200">
-                  <th className="py-3.5 px-3 font-semibold">User ID</th>
-                  <th className="py-3.5 px-3 font-semibold">User Name</th>
-                  <th className="py-3.5 px-3 font-semibold">Email</th>
-                  <th className="py-3.5 px-3 font-semibold">Date Created</th>
-                  <th className="py-3.5 px-3 font-semibold">User Level</th>
-                  <th className="py-3.5 px-3 font-semibold">Status</th>
-                  <th className="py-3.5 px-3 font-semibold">Action</th>
+                <tr className="text-left bg-slate-50/50 text-slate-400 border-b border-slate-100 text-[10px] font-black uppercase tracking-wider">
+                  <th className="py-3.5 px-4 font-semibold">User ID</th>
+                  <th className="py-3.5 px-4 font-semibold">User Name</th>
+                  <th className="py-3.5 px-4 font-semibold">Email</th>
+                  <th className="py-3.5 px-4 font-semibold">Date Created</th>
+                  <th className="py-3.5 px-4 font-semibold">User Level</th>
+                  <th className="py-3.5 px-4 font-semibold">Status</th>
+                  <th className="py-3.5 px-4 font-semibold">Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-50">
                 {users.map((user, index) => (
                   <tr
                     key={user.id}
-                    className="border-b border-slate-50 hover:bg-slate-50/50 animate-fade-in-up"
+                    className="hover:bg-slate-50/50 transition-colors animate-fade-in-up"
                     style={{
                       animationDelay: `${index * 50}ms`,
                       animationFillMode: 'both',
                     }}
                   >
-                    <td className="py-3 px-3 font-mono text-slate-600 text-xs">{user.id}</td>
-                    <td className="py-3 px-3 font-medium text-slate-800">{user.username || '–'}</td>
-                    <td className="py-3 px-3 text-slate-600">{user.email || '–'}</td>
-                    <td className="py-3 px-3 text-slate-600">{formatDate(user.created_at)}</td>
-                    <td className="py-3 px-3">
+                    <td className="py-3 px-4 font-mono text-slate-400 text-[10px] uppercase font-bold">{user.id}</td>
+                    <td className="py-3 px-4 font-bold text-slate-800 text-xs">{user.username || '–'}</td>
+                    <td className="py-3 px-4 text-slate-600 font-semibold text-xs">{user.email || '–'}</td>
+                    <td className="py-3 px-4 text-slate-500 font-medium text-xs whitespace-nowrap">{formatDate(user.created_at)}</td>
+                    <td className="py-3 px-4">
                       <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium capitalize ${
+                        className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
                           user.user_level === 'admin'
-                            ? 'bg-violet-100 text-violet-700'
-                            : 'bg-blue-100 text-blue-700'
+                            ? 'bg-violet-50 text-[#7030a0] border border-violet-100/50'
+                            : 'bg-blue-50 text-blue-700 border border-blue-100/50'
                         }`}
                       >
                         {user.user_level || 'assistant'}
                       </span>
                     </td>
-                    <td className="py-3 px-3">
+                    <td className="py-3 px-4">
                       <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
                           user.is_active
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-red-100 text-red-700'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100/50'
+                            : 'bg-rose-50 text-rose-700 border border-rose-100/50'
                         }`}
                       >
                         {user.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="py-3 px-3">
+                    <td className="py-3 px-4">
                       <button
                         type="button"
                         onClick={() => handleViewDetails(user)}
-                        className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 hover:shadow-sm transition-all duration-200"
+                        className="px-3.5 py-1.5 rounded-xl bg-violet-50 text-[#7030a0] text-[11px] font-bold hover:bg-violet-100/80 active:scale-95 transition-all duration-200"
                       >
                         View Details
                       </button>
@@ -1024,6 +1000,7 @@ export default function Users() {
           </div>
         )}
       </div>
+
 
       <AddUserModal
         isOpen={addUserModalOpen}

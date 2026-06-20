@@ -260,10 +260,10 @@ export default function GenerateReport({ period, dateRange }) {
       ? `<section><h2>Question averages</h2><table><thead><tr><th>Part</th><th>Question</th><th>Average</th></tr></thead><tbody>${questionRowsHtml}</tbody></table></section>`
       : '';
     const respondentsSection = respondents
-      ? `<section><h2>List of respondents</h2><table><thead><tr><th>Parent / guardian</th><th>Sex</th><th>Contact</th><th>Office / unit</th><th>Child age</th><th>Child sex</th><th>Date of use</th><th>Submitted</th></tr></thead><tbody>${respondentsHtml}</tbody></table></section>`
+      ? `<section><h2>List of respondents</h2><table><thead><tr><th>Parent / guardian</th><th>Sex</th><th>Contact</th><th>Office / unit</th><th>Child age</th><th>Child sex</th><th>Date registered</th><th>Submitted</th></tr></thead><tbody>${respondentsHtml}</tbody></table></section>`
       : '';
     const suggestionsSection = suggestions
-      ? `<section><h2>Suggestions</h2><table><thead><tr><th>Date</th><th>Office / unit</th><th>Date of use</th><th>Suggestion</th></tr></thead><tbody>${suggestionsHtml}</tbody></table></section>`
+      ? `<section><h2>Suggestions</h2><table><thead><tr><th>Date</th><th>Office / unit</th><th>Date registered</th><th>Suggestion</th></tr></thead><tbody>${suggestionsHtml}</tbody></table></section>`
       : '';
 
     const bodyParts = [dateBlock, questionSection, respondentsSection, suggestionsSection].filter(Boolean);
@@ -456,7 +456,7 @@ export default function GenerateReport({ period, dateRange }) {
                     <th className="py-3.5 px-3 font-semibold">Office / unit</th>
                     <th className="py-3.5 px-3 font-semibold">Child age</th>
                     <th className="py-3.5 px-3 font-semibold">Child sex</th>
-                    <th className="py-3.5 px-3 font-semibold">Date of use</th>
+                    <th className="py-3.5 px-3 font-semibold">Date registered</th>
                     <th className="py-3.5 px-3 font-semibold">Submitted</th>
                   </tr>
                 </thead>
@@ -568,7 +568,7 @@ export default function GenerateReport({ period, dateRange }) {
                   <tr className="text-left bg-slate-50/80 text-slate-600 border-b-2 border-slate-200">
                     <th className="py-3.5 px-3 font-semibold">Date</th>
                     <th className="py-3.5 px-3 font-semibold">Office / unit</th>
-                    <th className="py-3.5 px-3 font-semibold">Date of use</th>
+                    <th className="py-3.5 px-3 font-semibold">Date registered</th>
                     <th className="py-3.5 px-3 font-semibold">Suggestion</th>
                   </tr>
                 </thead>

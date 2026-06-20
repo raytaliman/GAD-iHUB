@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Retrieve Supabase environment variables from import.meta.env (Vite)
-const url = (import.meta.env.VITE_SUPABASE_URL || '').trim();
+const url = (import.meta.env.VITE_API_URL || import.meta.env.VITE_SUPABASE_URL || '').trim();
 // Custom PostgREST setups do not require a Supabase API key, but supabase-js requires a non-empty string.
 const key = (import.meta.env.VITE_SUPABASE_ANON_KEY || 'none').trim();
 

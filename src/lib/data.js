@@ -154,7 +154,7 @@ function parsePeriod(period) {
 export async function fetchFeedback(period = 'This month', dateRange = null) {
   if (!supabase) {
     throw new Error(
-      'Supabase is not configured. Create dashboard/.env with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (see .env.example).'
+      'API connection is not configured. Create .env with VITE_API_URL or VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.'
     );
   }
   // Query from evaluations and join with registrations
@@ -175,14 +175,85 @@ export async function fetchFeedback(period = 'This month', dateRange = null) {
 
   if (dateRange && dateRange.from && dateRange.to) {
     const from = new Date(dateRange.from);
+    from.setHours(0, 0, 0, 0);
     const to = new Date(dateRange.to);
+    to.setHours(23, 59, 59, 999);
     return list.filter((r) => {
       const d = new Date(r.created_at);
       return d >= from && d <= to;
     });
   }
+  // 'All' period: return everything with no date filter
+  if (period === 'All') return list;
   const { from } = parsePeriod(period);
   return list.filter((r) => new Date(r.created_at) >= from);
+}
+
+/**
+ * Fetches ALL registrations directly from the registrations table with no date filter.
+ * Each registration row has its children parsed from JSON.
+ *
+ * @async
+ * @throws {Error} If Supabase is not configured or a database error occurs.
+ * @returns {Promise<Array<Object>>} A list of all registration records.
+ */
+export async function fetchAllRegistrations() {
+  if (!supabase) {
+    throw new Error(
+      'API connection is not configured. Create .env with VITE_API_URL or VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.'
+    );
+  }
+  const { data, error } = await supabase
+    .from('registrations')
+    .select('*, evaluations(id, created_at)')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data || []).map((r) => {
+    // Parse children if stored as JSON string
+    let children = r.children;
+    if (typeof children === 'string') {
+      try { children = JSON.parse(children); } catch { children = []; }
+    }
+    if (!Array.isArray(children)) children = [];
+    const evals = r.evaluations || [];
+    const evalItem = evals[0] || null;
+    return { 
+      ...r, 
+      children,
+      time_out: evalItem ? evalItem.created_at : null,
+      eval_id: evalItem ? evalItem.id : null
+    };
+  });
+}
+
+/**
+ * Updates a registration record in Supabase.
+ *
+ * @async
+ * @param {string|number} id - The registration row ID.
+ * @param {Object} fields - Fields to update (e.g. parent_name, email, children, …).
+ * @throws {Error} If Supabase is not configured or a database error occurs.
+ * @returns {Promise<Object>} The updated registration row.
+ */
+export async function updateRegistration(id, fields) {
+  if (!supabase) {
+    throw new Error('Supabase is not configured.');
+  }
+  // Ensure children is stored as a plain array (Supabase handles JSON columns)
+  const payload = { ...fields };
+  if (payload.children && typeof payload.children !== 'string') {
+    payload.children = payload.children; // keep as array; Supabase serialises automatically
+  }
+  const { data, error } = await supabase
+    .from('registrations')
+    .update(payload)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
 }
 
 /**
@@ -507,14 +578,22 @@ export function basicInfoByChildAge(list) {
 export function formatRespondents(list) {
   return (list || []).map((r) => ({
     ...r,
-    dateOfUseFormatted: r.date_of_use
-      ? new Date(r.date_of_use).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    dateOfUseFormatted: r.created_at
+      ? new Date(r.created_at).toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
       : '—',
-    submittedFormatted: new Date(r.created_at).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }),
+    submittedFormatted: r.created_at
+      ? new Date(r.created_at).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : '—',
   }));
 }
 
@@ -547,5 +626,47 @@ export function avgSatisfactionByPart(list) {
       avg: part4Scores.length ? part4Scores.reduce((a, b) => a + b, 0) / part4Scores.length : 0,
     },
   ];
+}
+
+/**
+ * Deletes all registration and visit records for a visitor based on email or name + contact number.
+ *
+ * @async
+ * @param {string|number} id - The registration row ID.
+ * @throws {Error} If Supabase is not configured or a database error occurs.
+ */
+export async function deleteRegistration(id) {
+  if (!supabase) {
+    throw new Error('Supabase is not configured.');
+  }
+
+  // 1. Fetch target registration to resolve visitor identity
+  const { data: target, error: fetchErr } = await supabase
+    .from('registrations')
+    .select('email, parent_name, contact_number')
+    .eq('id', id)
+    .single();
+
+  if (fetchErr || !target) {
+    // Fallback: Delete single row if not found
+    const { error: delErr } = await supabase
+      .from('registrations')
+      .delete()
+      .eq('id', id);
+    if (delErr) throw delErr;
+    return;
+  }
+
+  // 2. Delete all registration records matching this visitor
+  let query = supabase.from('registrations').delete();
+  if (target.email && target.email.trim()) {
+    const { error: delErr } = await query.eq('email', target.email.trim());
+    if (delErr) throw delErr;
+  } else {
+    const { error: delErr } = await query
+      .eq('parent_name', target.parent_name)
+      .eq('contact_number', target.contact_number);
+    if (delErr) throw delErr;
+  }
 }
 

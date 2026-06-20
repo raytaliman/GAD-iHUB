@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-export default function ModernSelect({ label, value, options, onChange, icon: Icon, placeholder = 'Select option', disabled = false }) {
+export default function ModernSelect({ label, value, options = [], onChange, icon: Icon, placeholder = 'Select option', disabled = false }) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="relative mb-4">
-            {label && <label className="text-sm font-semibold text-slate-700 mb-1.5 block px-1">{label}</label>}
+        <div className="relative mb-3">
+            {label && <label className="text-xs font-semibold text-slate-600 mb-1 block px-0.5">{label}</label>}
             <button
                 type="button"
                 disabled={disabled}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all ${isOpen ? 'border-[#7030a0] ring-4 ring-violet-100' : 'border-slate-200 hover:border-violet-300'
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all ${isOpen ? 'border-[#7030a0] ring-4 ring-violet-100' : 'border-slate-200 hover:border-violet-300'
                     } ${disabled ? 'bg-slate-50 opacity-60 cursor-not-allowed' : 'bg-white shadow-sm'}`}
             >
-                <div className="flex items-center gap-3">
-                    {Icon && <Icon size={18} className={value ? 'text-[#7030a0]' : 'text-slate-400'} />}
-                    <span className={`text-sm ${value ? 'text-slate-800 font-medium' : 'text-slate-400'}`}>
+                <div className="flex items-center gap-2.5">
+                    {Icon && <Icon size={16} className={value ? 'text-[#7030a0]' : 'text-slate-400'} />}
+                    <span className={`text-xs ${value ? 'text-slate-800 font-medium' : 'text-slate-400'}`}>
                         {value || placeholder}
                     </span>
                 </div>
-                <ChevronDown size={18} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (
