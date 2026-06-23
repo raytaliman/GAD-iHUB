@@ -19,7 +19,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-    command: node server.js
+    command: sh -c "npm install --production && node server.js"
     ports:
       - "3003:3003"
     environment:
