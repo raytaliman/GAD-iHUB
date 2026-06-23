@@ -12,6 +12,24 @@ services:
     ports:
       - "${API_PORT:-3001}:3000"
 
+  email:
+    image: node:20-alpine
+    container_name: ihub-email
+    restart: always
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: node server.js
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM=${SMTP_FROM}
+
   app:
     build:
       context: .
@@ -25,6 +43,7 @@ services:
       - "${APP_PORT:-3002}:80"
     depends_on:
       - api
+      - email
 
 # No global volumes needed for bind mounts
 

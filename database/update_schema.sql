@@ -1,7 +1,10 @@
 -- Fix registrations table schema
 ALTER TABLE public.registrations 
   ADD COLUMN IF NOT EXISTS first_name text,
+  ADD COLUMN IF NOT EXISTS middle_name text,
   ADD COLUMN IF NOT EXISTS last_name text,
+  ADD COLUMN IF NOT EXISTS email text,
+  ADD COLUMN IF NOT EXISTS birthdate date,
   ADD COLUMN IF NOT EXISTS client_type text,
   ADD COLUMN IF NOT EXISTS activities text;
 
