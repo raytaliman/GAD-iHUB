@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share, Calendar, Check, ChevronDown, ChevronLeft, ChevronRight, CheckCircle2, Smile, Meh, Frown, UserCircle, Building2, FileText, Heart, Sparkles, Baby, Palette, PartyPopper, Shapes, Star, Gift, Sun, Music, AlertCircle, X, Camera } from 'lucide-react';
+import { Share, Calendar, Check, ChevronDown, ChevronLeft, ChevronRight, CheckCircle2, Smile, Meh, Frown, UserCircle, Building2, FileText, Heart, Sparkles, Baby, Palette, PartyPopper, Shapes, Star, Gift, Sun, Music, AlertCircle, X, Camera, Download } from 'lucide-react';
 import logo from '../assets/logo.png';
 import ModernSelect from '../components/common/ModernSelect';
 import ModernDatePicker from '../components/common/ModernDatePicker';
@@ -34,6 +34,7 @@ export default function FeedbackForm() {
         setUserCode,
         codeValidated,
         generatedCode,
+        generatedIdCardUrl,
         currentPart,
         setCurrentPart,
         showCoverPage,
@@ -668,15 +669,27 @@ export default function FeedbackForm() {
                                         <p className="text-slate-600 mb-6 text-sm">
                                             Your registration is complete. Please save your code below to submit your evaluation later.
                                         </p>
-                                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-8">
+                                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-6">
                                             <span className="text-sm font-medium text-slate-500 mb-2 block">Your Unique Code</span>
                                             <span className="text-4xl font-black text-[#7030a0] tracking-widest">{generatedCode}</span>
                                             {formData.email && (
                                                 <p className="mt-3 text-xs text-violet-600 font-bold">
-                                                    📧 A copy was sent to {formData.email}
+                                                    📧 A copy with your QR code & Access Pass was sent to {formData.email}
                                                 </p>
                                             )}
                                         </div>
+                                        {generatedIdCardUrl && (
+                                            <div className="mb-8">
+                                                <a
+                                                    href={generatedIdCardUrl}
+                                                    download={`AccessPass-${generatedCode}.png`}
+                                                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-violet-50 hover:bg-violet-100 text-[#7030a0] border border-violet-200 rounded-2xl font-bold text-xs transition-all active:scale-95 shadow-sm"
+                                                >
+                                                    <Download size={16} />
+                                                    Download Access Pass ID (Image)
+                                                </a>
+                                            </div>
+                                        )}
                                     </>
                                 ) : flowType === 'checkin' ? (
                                     <>
