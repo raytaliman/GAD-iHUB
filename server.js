@@ -115,21 +115,23 @@ app.post('/api/send-email', async (req, res) => {
               </td>
             </tr>
 
-            <!-- CODE ID & QR CODE BOX -->
+            <!-- QR CODE (TOP) & CODE ID (BELOW) BOX -->
             <tr>
               <td style="padding: 0 28px 20px 28px;" align="center">
-                <div style="max-width: 380px; background-color: #faf5ff; border: 2px dashed #d8b4fe; border-radius: 20px; padding: 24px 20px; text-align: center;">
+                <div style="max-width: 360px; background-color: #faf5ff; border: 2px dashed #d8b4fe; border-radius: 20px; padding: 24px 20px; text-align: center;">
                   
-                  <span style="display: block; font-size: 11px; font-weight: 800; color: #7030a0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
-                    Your Code ID
-                  </span>
-                  
-                  <div style="font-size: 38px; font-weight: 900; color: #7030a0; letter-spacing: 3px; line-height: 1.2; margin-bottom: 16px;">
-                    ${code}
+                  <!-- QR Code on top -->
+                  <div style="background-color: #ffffff; padding: 12px; border-radius: 16px; display: inline-block; box-shadow: 0 4px 12px rgba(112, 48, 160, 0.08); margin-bottom: 16px;">
+                    <img src="cid:qrcode" width="190" height="190" alt="QR Code" style="display: block; border-radius: 8px;" />
                   </div>
 
-                  <div style="background-color: #ffffff; padding: 12px; border-radius: 16px; display: inline-block; box-shadow: 0 4px 12px rgba(112, 48, 160, 0.08); margin-bottom: 14px;">
-                    <img src="cid:qrcode" width="180" height="180" alt="QR Code" style="display: block; border-radius: 8px;" />
+                  <!-- Code ID below QR Code -->
+                  <span style="display: block; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;">
+                    Code ID
+                  </span>
+                  
+                  <div style="font-size: 38px; font-weight: 900; color: #7030a0; letter-spacing: 3px; line-height: 1.2; margin-bottom: 12px;">
+                    ${code}
                   </div>
 
                   <p style="margin: 0; font-size: 12px; font-weight: 700; color: #64748b;">

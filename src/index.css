@@ -28,6 +28,10 @@ body {
 }
 
 /* Animations */
+/* Ensure toast notifications always render on top of modals and portals */
+.Toastify__toast-container {
+  z-index: 999999 !important;
+}
 @keyframes fade-in-up {
   from {
     opacity: 0;

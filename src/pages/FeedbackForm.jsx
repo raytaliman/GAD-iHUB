@@ -61,16 +61,6 @@ export default function FeedbackForm() {
         setRegistrationId,
     } = useFeedbackForm();
 
-    // Auto-hide snackbar notifications
-    React.useEffect(() => {
-        if (snackbar.show) {
-            const timer = setTimeout(() => {
-                setSnackbar(prev => ({ ...prev, show: false }));
-            }, 4000);
-            return () => clearTimeout(timer);
-        }
-    }, [snackbar.show, setSnackbar]);
-
     const [showStationModal, setShowStationModal] = useState(false);
     const [showBackConfirm, setShowBackConfirm] = useState(false);
     const [showServicesModal, setShowServicesModal] = useState(false);
@@ -1652,16 +1642,7 @@ export default function FeedbackForm() {
                         </div>
                     )}
 
-                    {/* Snackbar Toast Notification */}
-                    {snackbar.show && (
-                        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 bg-[#7030a0] text-white rounded-2xl shadow-xl shadow-violet-950/20 border border-violet-500/20 animate-in slide-in-from-top-5 fade-in duration-300 max-w-sm w-[90%] sm:w-auto">
-                            <AlertCircle size={18} className="text-pink-300 shrink-0" />
-                            <span className="text-xs font-semibold flex-1 leading-relaxed">{snackbar.message}</span>
-                            <button onClick={() => setSnackbar(prev => ({ ...prev, show: false }))} className="p-1 hover:bg-white/10 rounded-lg transition-colors text-violet-200 hover:text-white">
-                                <X size={14} />
-                            </button>
-                        </div>
-                    )}
+
 
                 </div>
             </main >

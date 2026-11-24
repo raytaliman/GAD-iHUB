@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, ChevronLeft, ChevronRight, X, User, Baby, Phone, Calendar, Building2, Download, Printer, Edit3, Save, Plus, Trash2, CheckCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { Search, ChevronLeft, ChevronRight, X, User, Baby, Phone, Calendar, Building2, Download, Printer, Edit3, Save, Plus, Trash2, CheckCircle, Mail, AlertCircle } from 'lucide-react';
 import * as QRCode from 'qrcode';
 import dostLogo from '../assets/dost_logo.png';
 import gadLogo from '../assets/logo.png';
+import { generateIdCardImage } from '../lib/idCardGenerator';
 import { fetchAllRegistrations, updateRegistration, formatRespondents, deleteRegistration } from '../lib/data';
 
 
@@ -38,6 +40,7 @@ function RespondentDetailsModal({ respondent: initialRespondent, allRespondents 
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [qrUrl, setQrUrl] = useState('');
+  const [resendingEmail, setResendingEmail] = useState(false);
 
   useEffect(() => {
     if (respondent) {
@@ -109,6 +112,7 @@ function RespondentDetailsModal({ respondent: initialRespondent, allRespondents 
       setRespondent(merged);
       setEditMode(false);
       setSaveSuccess(true);
+      toast.success('Registration details saved successfully!');
       setTimeout(() => setSaveSuccess(false), 3000);
       if (onUpdated) onUpdated(merged);
     } catch (e) {
@@ -136,6 +140,50 @@ function RespondentDetailsModal({ respondent: initialRespondent, allRespondents 
         children: Array.isArray(r.children) ? r.children.map(c => c.name).filter(Boolean) : [],
       }));
   }, [respondent, allRespondents]);
+
+  const handleResendEmail = async () => {
+    if (!respondent.email || !respondent.email.trim()) {
+      toast.error('No email address registered for this visitor.');
+      return;
+    }
+
+    setResendingEmail(true);
+    try {
+      const idCardImage = await generateIdCardImage({
+        code: respondent.code,
+        parentName: respondent.parent_name,
+        contactNumber: respondent.contact_number,
+        countryCode: respondent.country_code,
+        email: respondent.email,
+      });
+
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: respondent.email,
+          code: respondent.code,
+          parentName: respondent.parent_name,
+          contactNumber: respondent.contact_number,
+          countryCode: respondent.country_code,
+          idCardImage,
+        }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to send email.');
+      }
+
+      toast.success(`Access Pass details sent to ${respondent.email}!`);
+    } catch (err) {
+      console.error('Error resending email:', err);
+      toast.error(err.message || 'Could not resend email.');
+    } finally {
+      setResendingEmail(false);
+    }
+  };
 
   const printIDCard = async () => {
     const toBase64 = (imgSrc) => new Promise((resolve) => {
@@ -518,9 +566,23 @@ function RespondentDetailsModal({ respondent: initialRespondent, allRespondents 
                     <span className="text-[5.5px] text-slate-400 font-bold uppercase tracking-wider">Scan to Check-In</span>
                   </div>
                 </div>
-                <div className="flex justify-center">
+                <div className="flex justify-center items-center gap-2.5 flex-wrap">
                   <button type="button" onClick={printIDCard} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#60288c] text-white text-xs font-bold active:scale-95 transition-all shadow-md shadow-violet-200">
                     <Printer size={14} /><span>Print ID Card</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResendEmail}
+                    disabled={resendingEmail || !respondent.email}
+                    title={!respondent.email ? 'No email address registered' : `Resend code and Access Pass to ${respondent.email}`}
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-violet-50 hover:bg-violet-100 text-[#7030a0] border border-violet-200 hover:border-violet-300 text-xs font-bold active:scale-95 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {resendingEmail ? (
+                      <span className="animate-spin h-3.5 w-3.5 border-2 border-violet-600 border-t-transparent rounded-full" />
+                    ) : (
+                      <Mail size={14} />
+                    )}
+                    <span>{resendingEmail ? 'Sending…' : 'Resend Email'}</span>
                   </button>
                 </div>
               </div>
