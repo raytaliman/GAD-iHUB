@@ -36,6 +36,7 @@ CREATE TABLE public.registrations (
   date_of_use date,
   service_availed text,
   activities text,
+  time_out timestamptz,
   created_at timestamptz DEFAULT now()
 );
 

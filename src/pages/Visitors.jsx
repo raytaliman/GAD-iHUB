@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, ChevronLeft, ChevronRight, User, Baby, Phone, Calendar, Building2, SlidersHorizontal, CheckCircle2, XCircle } from 'lucide-react';
-import { fetchAllRegistrations } from '../lib/data';
+import { Search, ChevronLeft, ChevronRight, User, Baby, Phone, Calendar, Building2, SlidersHorizontal, CheckCircle2, XCircle, LogOut, Clock } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { fetchAllRegistrations, recordTimeOut } from '../lib/data';
 
 const formatOfficeUnit = (r) => {
   if (!r) return '–';
@@ -57,6 +58,27 @@ export default function Visitors() {
   const [selectedDate, setSelectedDate] = useState(() => {
     return new Date().toISOString().split('T')[0];
   });
+  const [timingOutId, setTimingOutId] = useState(null);
+
+  const handleManualTimeOut = async (visitor) => {
+    if (!visitor || !visitor.id) return;
+    setTimingOutId(visitor.id);
+    try {
+      const nowIso = new Date().toISOString();
+      await recordTimeOut(visitor.id, nowIso);
+      setRows((prev) =>
+        prev.map((item) =>
+          item.id === visitor.id ? { ...item, time_out: nowIso } : item
+        )
+      );
+      toast.success(`Departure recorded for ${visitor.parent_name || 'visitor'}`);
+    } catch (err) {
+      console.error('Manual time out error:', err);
+      toast.error('Failed to record Time Out: ' + (err.message || 'Error'));
+    } finally {
+      setTimingOutId(null);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -227,12 +249,13 @@ export default function Visitors() {
                       <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider">Time Out</th>
                       <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider">Duration</th>
                       <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider text-center">Survey Status</th>
+                      <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider text-center">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
                     {filtered.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-16 text-center bg-slate-50/10">
+                        <td colSpan={9} className="py-16 text-center bg-slate-50/10">
                           <User size={40} className="text-slate-300 mx-auto mb-3" />
                           <h3 className="font-bold text-slate-700 text-sm">No visitors found</h3>
                           <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
@@ -274,11 +297,33 @@ export default function Visitors() {
                               {r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '–'}
                             </p>
                           </td>
-                          <td className="py-3.5 px-5 text-slate-700 font-bold text-xs">{formatTime(r.time_out)}</td>
                           <td className="py-3.5 px-5">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold ${r.time_out ? 'bg-[#7030a0]/10 text-[#7030a0]' : 'bg-slate-100 text-slate-400'}`}>
-                              {formatDuration(r.created_at, r.time_out)}
-                            </span>
+                            {r.time_out ? (
+                              <>
+                                <p className="text-slate-700 font-bold text-xs">{formatTime(r.time_out)}</p>
+                                <p className="text-slate-400 text-[9px] font-semibold mt-0.5">
+                                  {new Date(r.time_out).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                </p>
+                              </>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Inside Hub
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-5">
+                            {r.time_out ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-[#7030a0]/10 text-[#7030a0]">
+                                {formatDuration(r.created_at, r.time_out)}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/50" title="Ongoing visit">
+                                <Clock size={10} />
+                                {formatDuration(r.created_at, new Date().toISOString())}
+                                <span className="text-[8px] opacity-75">(live)</span>
+                              </span>
+                            )}
                           </td>
                           <td className="py-3.5 px-5 text-center">
                             {r.eval_id ? (
@@ -289,6 +334,26 @@ export default function Visitors() {
                               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-slate-100 text-slate-400 border border-slate-200/40">
                                 <XCircle size={12} /> Pending
                               </span>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-5 text-center">
+                            {!r.time_out ? (
+                              <button
+                                type="button"
+                                onClick={() => handleManualTimeOut(r)}
+                                disabled={timingOutId === r.id}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-violet-50 hover:bg-[#7030a0] text-[#7030a0] hover:text-white border border-violet-200/60 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                                title="Record visitor departure now"
+                              >
+                                {timingOutId === r.id ? (
+                                  <div className="w-3.5 h-3.5 border-2 border-[#7030a0] border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <LogOut size={13} />
+                                )}
+                                <span>Time Out</span>
+                              </button>
+                            ) : (
+                              <span className="text-[11px] font-semibold text-slate-400 italic">Completed</span>
                             )}
                           </td>
                         </tr>

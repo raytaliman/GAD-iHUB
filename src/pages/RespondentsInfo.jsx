@@ -22,6 +22,26 @@ const formatOfficeUnit = (r) => {
   return `${address} (${other})`;
 };
 
+const formatDuration = (startIso, endIso) => {
+  if (!startIso || !endIso) return null;
+  try {
+    const start = new Date(startIso);
+    const end = new Date(endIso);
+    const diffMs = end - start;
+    if (diffMs < 0) return null;
+    
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 60) {
+      return `${diffMins}m`;
+    }
+    const hrs = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+    return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+  } catch (e) {
+    return null;
+  }
+};
+
 /**
  * Modal component that displays detailed information about a specific respondent, 
  * including their contact details, office, and all registered children.
@@ -135,6 +155,8 @@ function RespondentDetailsModal({ respondent: initialRespondent, allRespondents 
       .map(r => ({
         date: new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         time: new Date(r.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        timeOut: r.time_out ? new Date(r.time_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : null,
+        duration: r.created_at ? formatDuration(r.created_at, r.time_out) : null,
         purpose: Array.isArray(r.children) && r.children.length > 0 ? 'Innovation Hub Access & GAD Childcare Support' : 'Innovation Hub Access',
         surveyAnswered: !!r.eval_id,
         children: Array.isArray(r.children) ? r.children.map(c => c.name).filter(Boolean) : [],
@@ -601,7 +623,19 @@ function RespondentDetailsModal({ respondent: initialRespondent, allRespondents 
                       <div>
                         <div className="flex items-center flex-wrap gap-2">
                           <span className="text-xs font-black text-slate-800">{v.date}</span>
-                          <span className="text-[10px] font-bold text-slate-400">{v.time}</span>
+                          <span className="text-[10px] font-bold text-slate-400">In: {v.time}</span>
+                          {v.timeOut ? (
+                            <span className="text-[10px] font-bold text-slate-400">Out: {v.timeOut}</span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-[9px] bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-100">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Inside Hub
+                            </span>
+                          )}
+                          {v.duration && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-extrabold bg-[#7030a0]/10 text-[#7030a0]">
+                              {v.duration}
+                            </span>
+                          )}
                           {v.surveyAnswered ? (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100">Survey Answered</span>
                           ) : (

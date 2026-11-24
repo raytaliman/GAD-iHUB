@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { supabase } from '../lib/supabase';
+import { generateIdCardImage } from '../lib/idCardGenerator';
 import { DEFAULT_FORM_PARTS } from '../constants/feedback';
 
 /**
@@ -29,6 +31,7 @@ export function useFeedbackForm() {
     const [userCode, setUserCode] = useState(''); // 5-digit code entered by user
     const [codeValidated, setCodeValidated] = useState(false); // Whether enter code is verified
     const [generatedCode, setGeneratedCode] = useState(''); // Newly generated code for registration
+    const [generatedIdCardUrl, setGeneratedIdCardUrl] = useState(''); // Newly generated ID card image URL
     const [registrationId, setRegistrationId] = useState(null); // DB ID of the current registration record
     const [currentPart, setCurrentPart] = useState(0); // Current wizard step index
     const [showCoverPage, setShowCoverPage] = useState(window.location.pathname === '/registration' ? false : true); // Toggle for intro screen
@@ -38,6 +41,15 @@ export function useFeedbackForm() {
 
     const triggerSnackbar = (message, type = 'error') => {
         setSnackbar({ show: true, message, type });
+        if (type === 'success') {
+            toast.success(message);
+        } else if (type === 'info') {
+            toast.info(message);
+        } else if (type === 'warning') {
+            toast.warning(message);
+        } else {
+            toast.error(message);
+        }
     };
 
 
@@ -182,10 +194,25 @@ export function useFeedbackForm() {
             if (error) throw error;
             setGeneratedCode(code);
 
-            // Send registration code to email if provided
+            const fullName = `${formData.firstName} ${formData.middleName ? formData.middleName + ' ' : ''}${formData.lastName}`.trim().replace(/\s+/g, ' ');
+            let idCardImage = '';
+            try {
+                idCardImage = await generateIdCardImage({
+                    code,
+                    parentName: fullName,
+                    contactNumber: formData.contactNumber,
+                    countryCode: formData.countryCode,
+                    email: formData.email,
+                });
+                setGeneratedIdCardUrl(idCardImage);
+            } catch (cardErr) {
+                console.error('Error generating ID card image:', cardErr);
+            }
+
+            // Send registration code and ID pass image to email if provided
             if (formData.email && formData.email.trim()) {
                 try {
-                    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+                    const apiUrl = import.meta.env.VITE_API_URL || '';
                     await fetch(`${apiUrl}/api/send-email`, {
                         method: 'POST',
                         headers: {
@@ -194,7 +221,10 @@ export function useFeedbackForm() {
                         body: JSON.stringify({
                             email: formData.email,
                             code: code,
-                            parentName: `${formData.firstName} ${formData.lastName}`.trim(),
+                            parentName: fullName,
+                            contactNumber: formData.contactNumber,
+                            countryCode: formData.countryCode,
+                            idCardImage: idCardImage,
                         }),
                     });
                 } catch (emailErr) {
@@ -255,6 +285,18 @@ export function useFeedbackForm() {
                 answers, comments: formData.comments || null
             }]);
             if (error) throw error;
+
+            // Auto-record time_out on evaluation submission if not yet recorded
+            try {
+                await supabase
+                    .from('registrations')
+                    .update({ time_out: new Date().toISOString() })
+                    .eq('id', registrationId)
+                    .is('time_out', null);
+            } catch (toErr) {
+                console.warn('Could not auto-update time_out on evaluation:', toErr);
+            }
+
             setShowThankYou(true);
         } catch (e) {
             console.error('Evaluation submission error:', e);
@@ -296,6 +338,8 @@ export function useFeedbackForm() {
         setCodeValidated,
         generatedCode,
         setGeneratedCode,
+        generatedIdCardUrl,
+        setGeneratedIdCardUrl,
         registrationId,
         setRegistrationId,
         currentPart,

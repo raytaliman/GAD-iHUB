@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share, Calendar, Check, ChevronDown, ChevronLeft, ChevronRight, CheckCircle2, Smile, Meh, Frown, UserCircle, Building2, FileText, Heart, Sparkles, Baby, Palette, PartyPopper, Shapes, Star, Gift, Sun, Music, AlertCircle, X, Camera, Download } from 'lucide-react';
+import { Share, Calendar, Check, ChevronDown, ChevronLeft, ChevronRight, CheckCircle2, Smile, Meh, Frown, UserCircle, Building2, FileText, Heart, Sparkles, Baby, Palette, PartyPopper, Shapes, Star, Gift, Sun, Music, AlertCircle, X, Camera, Download, LogOut, Clock, ArrowRight } from 'lucide-react';
 import logo from '../assets/logo.png';
 import ModernSelect from '../components/common/ModernSelect';
 import ModernDatePicker from '../components/common/ModernDatePicker';
@@ -73,6 +73,16 @@ export default function FeedbackForm() {
     const [checkinStep, setCheckinStep] = useState(0);
     const [isSubmittingCheckin, setIsSubmittingCheckin] = useState(false);
     const [checkinWarning, setCheckinWarning] = useState('');
+    const [checkinActiveVisit, setCheckinActiveVisit] = useState(null);
+
+    // Time-out Flow States
+    const [timeoutInput, setTimeoutInput] = useState('');
+    const [verifiedTimeoutVisitor, setVerifiedTimeoutVisitor] = useState(null);
+    const [isVerifyingTimeout, setIsVerifyingTimeout] = useState(false);
+    const [isSubmittingTimeout, setIsSubmittingTimeout] = useState(false);
+    const [timeoutStep, setTimeoutStep] = useState(0); // 0: Enter/Scan Code, 1: Confirm Departure
+    const [timeoutWarning, setTimeoutWarning] = useState('');
+    const [timeoutResult, setTimeoutResult] = useState(null);
 
     // Service Evaluation Verification States
     const [evalVerifyInput, setEvalVerifyInput] = useState('');
@@ -97,7 +107,29 @@ export default function FeedbackForm() {
 
     React.useEffect(() => {
         setCheckinWarning('');
+        setCheckinActiveVisit(null);
     }, [checkinInput]);
+
+    React.useEffect(() => {
+        setTimeoutWarning('');
+    }, [timeoutInput]);
+
+    const formatDuration = (startIso, endIso) => {
+        if (!startIso || !endIso) return '–';
+        try {
+            const start = new Date(startIso);
+            const end = new Date(endIso);
+            const diffMs = end - start;
+            if (diffMs < 0) return '–';
+            const diffMins = Math.floor(diffMs / 60000);
+            if (diffMins < 60) return `${diffMins}m`;
+            const hrs = Math.floor(diffMins / 60);
+            const mins = diffMins % 60;
+            return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+        } catch (e) {
+            return '–';
+        }
+    };
 
     // Inject jsQR library dynamically
     React.useEffect(() => {
@@ -207,6 +239,9 @@ export default function FeedbackForm() {
                 if (scannerTargetRef.current === 'evaluate') {
                     setEvalVerifyInput(scannedCode);
                     handleVerifyEvalVisitor(scannedCode);
+                } else if (scannerTargetRef.current === 'timeout') {
+                    setTimeoutInput(scannedCode);
+                    handleVerifyTimeoutVisitor(scannedCode);
                 } else {
                     setCheckinInput(scannedCode);
                     handleVerifyVisitor(scannedCode);
@@ -251,7 +286,7 @@ export default function FeedbackForm() {
             if (visitor.email && visitor.email.trim()) {
                 const { data: latestData } = await supabase
                     .from('registrations')
-                    .select('created_at')
+                    .select('id, code, parent_name, email, contact_number, service_availed, created_at, time_out')
                     .eq('email', visitor.email.trim())
                     .order('created_at', { ascending: false })
                     .limit(1);
@@ -261,7 +296,7 @@ export default function FeedbackForm() {
             } else {
                 const { data: latestData } = await supabase
                     .from('registrations')
-                    .select('created_at')
+                    .select('id, code, parent_name, email, contact_number, service_availed, created_at, time_out')
                     .eq('parent_name', visitor.parent_name)
                     .eq('contact_number', visitor.contact_number)
                     .order('created_at', { ascending: false })
@@ -280,6 +315,12 @@ export default function FeedbackForm() {
                                   latestVisitDate.getFullYear() === today.getFullYear();
                 if (isSameDay) {
                     const timeString = latestVisitDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    if (!latestVisit.time_out) {
+                        setCheckinActiveVisit(latestVisit);
+                        const msg = `You are currently checked in (since ${timeString}). Did you mean to record your departure (Time Out)?`;
+                        setCheckinWarning(msg);
+                        return;
+                    }
                     const msg = `Your check-in entry has already been recorded today at ${timeString}.`;
                     setCheckinWarning(msg);
                     return;
@@ -300,6 +341,98 @@ export default function FeedbackForm() {
             triggerSnackbar('An error occurred during verification.');
         } finally {
             setIsVerifying(false);
+        }
+    };
+
+    const handleVerifyTimeoutVisitor = async (scannedCode) => {
+        setTimeoutWarning('');
+        const query = (typeof scannedCode === 'string' ? scannedCode : timeoutInput).trim();
+        if (!query) {
+            setTimeoutWarning('Please enter your Visitor Code or Email address.');
+            return;
+        }
+        setIsVerifyingTimeout(true);
+        try {
+            // Find registration by code or email
+            const { data, error } = await supabase
+                .from('registrations')
+                .select('*')
+                .or(`code.eq.${query},email.eq.${query}`)
+                .order('created_at', { ascending: false });
+
+            if (error || !data || data.length === 0) {
+                setTimeoutWarning('No registered visitor found with that Code or Email.');
+                return;
+            }
+
+            const visitor = data[0];
+
+            // Fetch recent visits for this visitor
+            let visitsQuery = supabase
+                .from('registrations')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(10);
+
+            if (visitor.email && visitor.email.trim()) {
+                visitsQuery = visitsQuery.eq('email', visitor.email.trim());
+            } else {
+                visitsQuery = visitsQuery.eq('parent_name', visitor.parent_name).eq('contact_number', visitor.contact_number);
+            }
+
+            const { data: visitsData, error: visitsError } = await visitsQuery;
+            if (visitsError) throw visitsError;
+
+            // Find an active visit (no time_out yet)
+            const activeVisit = (visitsData || []).find(v => !v.time_out);
+
+            if (!activeVisit) {
+                // If the most recent visit already has time_out, inform user
+                const latest = visitsData?.[0];
+                if (latest && latest.time_out) {
+                    const outTime = new Date(latest.time_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    setTimeoutWarning(`Your departure (Time Out) was already recorded today at ${outTime}.`);
+                } else {
+                    setTimeoutWarning('No active check-in visit found for this visitor. Please check in first.');
+                }
+                return;
+            }
+
+            setVerifiedTimeoutVisitor(activeVisit);
+            setTimeoutStep(1);
+        } catch (err) {
+            console.error('Time out verification error:', err);
+            triggerSnackbar('An error occurred during verification.');
+        } finally {
+            setIsVerifyingTimeout(false);
+        }
+    };
+
+    const handleConfirmTimeout = async () => {
+        if (!verifiedTimeoutVisitor) return;
+        setIsSubmittingTimeout(true);
+        try {
+            const nowIso = new Date().toISOString();
+            const { error } = await supabase
+                .from('registrations')
+                .update({ time_out: nowIso })
+                .eq('id', verifiedTimeoutVisitor.id);
+
+            if (error) throw error;
+
+            const durationStr = formatDuration(verifiedTimeoutVisitor.created_at, nowIso);
+            setTimeoutResult({
+                visitor: verifiedTimeoutVisitor,
+                timeIn: verifiedTimeoutVisitor.created_at,
+                timeOut: nowIso,
+                duration: durationStr
+            });
+            setShowThankYou(true);
+        } catch (err) {
+            console.error('Time out recording error:', err);
+            triggerSnackbar('Could not record Time Out: ' + err.message);
+        } finally {
+            setIsSubmittingTimeout(false);
         }
     };
 
@@ -583,7 +716,7 @@ export default function FeedbackForm() {
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                                     <button
                                         onClick={() => { handleInputChange('serviceAvailed', 'Child Minding Station'); setFlowType('register'); setShowCoverPage(false); window.history.pushState({}, '', '/registration'); }}
                                         className="group bg-gradient-to-br from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2783] text-white p-5 rounded-3xl font-bold transition-all shadow-lg hover:shadow-violet-200 hover:shadow-xl active:scale-[0.98] text-left flex flex-col justify-between min-h-[145px] border border-transparent"
@@ -592,9 +725,44 @@ export default function FeedbackForm() {
                                             <Baby size={24} className="group-hover:scale-110 transition-transform duration-300 text-pink-200" />
                                         </div>
                                         <div className="flex flex-col mt-3">
-                                            <span className="text-lg tracking-wide font-extrabold leading-tight">Register</span>
+                                            <span className="text-base tracking-wide font-extrabold leading-tight">Register</span>
                                             <span className="text-[8.5px] font-black text-violet-200 uppercase tracking-wider mt-0.5">First Entry</span>
-                                            <span className="text-[11px] font-normal text-violet-200/90 mt-2">Register details for your first visit to get your unique visitor code</span>
+                                            <span className="text-[11px] font-normal text-violet-200/90 mt-2">Register details for your first visit to get your unique code</span>
+                                        </div>
+                                    </button>
+
+                                    <button
+                                        onClick={() => setShowServicesModal(true)}
+                                        className="group bg-white border border-slate-100 hover:border-violet-200 hover:bg-violet-50/5 text-slate-700 p-5 rounded-3xl font-bold transition-all active:scale-[0.98] text-left flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:scale-[1.01]"
+                                    >
+                                        <div className="bg-violet-50 p-2.5 rounded-2xl w-fit group-hover:bg-violet-100 transition-colors">
+                                            <Building2 size={24} className="group-hover:scale-110 transition-transform duration-300 text-[#7030a0]" />
+                                        </div>
+                                        <div className="flex flex-col mt-3">
+                                            <span className="text-base tracking-wide font-extrabold leading-tight group-hover:text-[#7030a0] transition-colors">Services & Check-in</span>
+                                            <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wider mt-0.5">Hub Stations</span>
+                                            <span className="text-[11px] font-normal text-slate-500 mt-2">Select a GAD station and check in for today's visit</span>
+                                        </div>
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+                                            setFlowType('timeout');
+                                            setShowCoverPage(false);
+                                            setTimeoutStep(0);
+                                            setTimeoutInput('');
+                                            setVerifiedTimeoutVisitor(null);
+                                            setTimeoutWarning('');
+                                        }}
+                                        className="group bg-white border border-slate-100 hover:border-violet-200 hover:bg-violet-50/5 text-slate-700 p-5 rounded-3xl font-bold transition-all active:scale-[0.98] text-left flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:scale-[1.01]"
+                                    >
+                                        <div className="bg-violet-50 p-2.5 rounded-2xl w-fit group-hover:bg-violet-100 transition-colors">
+                                            <LogOut size={24} className="group-hover:scale-110 transition-transform duration-300 text-[#7030a0]" />
+                                        </div>
+                                        <div className="flex flex-col mt-3">
+                                            <span className="text-base tracking-wide font-extrabold leading-tight group-hover:text-[#7030a0] transition-colors">Time Out</span>
+                                            <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wider mt-0.5">Record Departure</span>
+                                            <span className="text-[11px] font-normal text-slate-500 mt-2">Scan QR code or enter code ID to complete your visit</span>
                                         </div>
                                     </button>
                                     
@@ -615,23 +783,9 @@ export default function FeedbackForm() {
                                             <Sparkles size={24} className="group-hover:scale-110 transition-transform duration-300 text-violet-600" />
                                         </div>
                                         <div className="flex flex-col mt-3">
-                                            <span className="text-lg tracking-wide font-extrabold leading-tight group-hover:text-[#7030a0] transition-colors">Service Evaluation</span>
-                                            <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wider mt-0.5">Returning Visit</span>
-                                            <span className="text-[11px] font-normal text-slate-500 mt-2">Enter your unique visitor code to evaluate our services</span>
-                                        </div>
-                                    </button>
-
-                                    <button
-                                        onClick={() => setShowServicesModal(true)}
-                                        className="group bg-white border border-slate-100 hover:border-violet-200 hover:bg-violet-50/5 text-slate-700 p-5 rounded-3xl font-bold transition-all active:scale-[0.98] text-left flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:scale-[1.01]"
-                                    >
-                                        <div className="bg-violet-50 p-2.5 rounded-2xl w-fit group-hover:bg-violet-100 transition-colors">
-                                            <Building2 size={24} className="group-hover:scale-110 transition-transform duration-300 text-[#7030a0]" />
-                                        </div>
-                                        <div className="flex flex-col mt-3">
-                                            <span className="text-lg tracking-wide font-extrabold leading-tight group-hover:text-[#7030a0] transition-colors">Services</span>
-                                            <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wider mt-0.5">Hub Stations</span>
-                                            <span className="text-[11px] font-normal text-slate-500 mt-2">Explore GAD child-minding, care rooms, and learning resource centers</span>
+                                            <span className="text-base tracking-wide font-extrabold leading-tight group-hover:text-[#7030a0] transition-colors">Service Evaluation</span>
+                                            <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wider mt-0.5">Feedback</span>
+                                            <span className="text-[11px] font-normal text-slate-500 mt-2">Enter your visitor code to evaluate our services and staff</span>
                                         </div>
                                     </button>
                                 </div>
@@ -652,7 +806,7 @@ export default function FeedbackForm() {
                                     <CheckCircle2 size={40} />
                                 </div>
                                 <h3 className="text-2xl font-black text-slate-800 mb-3">
-                                    {flowType === 'register' ? 'Registration Complete!' : flowType === 'checkin' ? 'Check-in Complete!' : 'Thank You!'}
+                                    {flowType === 'register' ? 'Registration Complete!' : flowType === 'checkin' ? 'Check-in Complete!' : flowType === 'timeout' ? 'Departure Recorded!' : 'Thank You!'}
                                 </h3>
                                 {flowType === 'register' ? (
                                     <>
@@ -688,8 +842,67 @@ export default function FeedbackForm() {
                                         </p>
                                         <div className="bg-violet-50 border border-violet-100/50 rounded-2xl p-4 mb-6 text-left">
                                             <p className="text-slate-700 text-xs leading-relaxed font-semibold">
-                                                <span className="text-[#7030a0] font-extrabold">Notice:</span> Please do not forget to submit your service evaluation before you leave today. Thank you!
+                                                <span className="text-[#7030a0] font-extrabold">Notice:</span> Please do not forget to record your Time Out or submit your service evaluation before you leave today. Thank you!
                                             </p>
+                                        </div>
+                                    </>
+                                ) : flowType === 'timeout' && timeoutResult ? (
+                                    <>
+                                        <p className="text-slate-600 mb-4 text-sm">
+                                            Thank you for visiting the Innovation Hub for GAD! Your departure has been recorded.
+                                        </p>
+                                        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-5 text-left space-y-2.5">
+                                            <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                                                <span className="text-xs font-bold text-slate-500">Visitor</span>
+                                                <span className="text-xs font-black text-slate-800">{timeoutResult.visitor?.parent_name}</span>
+                                            </div>
+                                            {timeoutResult.visitor?.service_availed && (
+                                                <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                                                    <span className="text-xs font-bold text-slate-500">Service Availed</span>
+                                                    <span className="text-xs font-extrabold text-[#7030a0]">{timeoutResult.visitor?.service_availed}</span>
+                                                </div>
+                                            )}
+                                            <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                                                <span className="text-xs font-bold text-slate-500">Time In</span>
+                                                <span className="text-xs font-extrabold text-slate-700">
+                                                    {new Date(timeoutResult.timeIn).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                                                <span className="text-xs font-bold text-slate-500">Time Out</span>
+                                                <span className="text-xs font-extrabold text-slate-700">
+                                                    {new Date(timeoutResult.timeOut).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between pt-1">
+                                                <span className="text-xs font-black text-[#7030a0] uppercase tracking-wider">Duration of Stay</span>
+                                                <span className="inline-flex items-center px-2.5 py-1 bg-violet-100 text-[#7030a0] rounded-xl text-sm font-black shadow-sm">
+                                                    <Clock size={14} className="mr-1.5" />
+                                                    {timeoutResult.duration}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-violet-50 border border-violet-200/60 rounded-2xl p-4 mb-6 text-left">
+                                            <p className="text-xs text-slate-700 font-semibold mb-3">
+                                                Help us improve! Would you like to take a quick 1-minute survey about your visit today?
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const code = timeoutResult.visitor?.code;
+                                                    setShowThankYou(false);
+                                                    setFlowType('evaluate');
+                                                    setEvalStep(0);
+                                                    setEvalVerifyInput(code || '');
+                                                    if (code) {
+                                                        handleVerifyEvalVisitor(code);
+                                                    }
+                                                }}
+                                                className="w-full py-2.5 bg-gradient-to-r from-violet-600 to-[#7030a0] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-violet-200 active:scale-95 transition-all flex items-center justify-center gap-1.5"
+                                            >
+                                                <Sparkles size={14} />
+                                                Take 1-Minute Service Evaluation
+                                            </button>
                                         </div>
                                     </>
                                 ) : (
@@ -697,7 +910,18 @@ export default function FeedbackForm() {
                                         Your response will help us maintain a safe, nurturing, and supportive environment for children and parents alike.
                                     </p>
                                 )}
-                                <button onClick={resetForm} className="bg-gradient-to-r from-violet-600 to-[#7030a0] text-white px-8 py-3.5 rounded-xl font-bold hover:shadow-lg active:scale-95 transition-all">
+                                <button
+                                    onClick={() => {
+                                        resetForm();
+                                        setTimeoutStep(0);
+                                        setTimeoutInput('');
+                                        setVerifiedTimeoutVisitor(null);
+                                        setTimeoutWarning('');
+                                        setTimeoutResult(null);
+                                        setCheckinActiveVisit(null);
+                                    }}
+                                    className="bg-gradient-to-r from-violet-600 to-[#7030a0] text-white px-8 py-3.5 rounded-xl font-bold hover:shadow-lg active:scale-95 transition-all"
+                                >
                                     Done
                                 </button>
                             </div>
@@ -1414,6 +1638,22 @@ export default function FeedbackForm() {
                                                     <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
                                                     <span className="text-xs font-semibold leading-relaxed">{checkinWarning}</span>
                                                 </div>
+                                                {checkinActiveVisit && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setFlowType('timeout');
+                                                            setVerifiedTimeoutVisitor(checkinActiveVisit);
+                                                            setTimeoutStep(1);
+                                                            setCheckinWarning('');
+                                                            setCheckinActiveVisit(null);
+                                                        }}
+                                                        className="mt-1.5 px-4 py-2 bg-gradient-to-r from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2783] text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+                                                    >
+                                                        <LogOut size={14} />
+                                                        Record Time Out Now
+                                                    </button>
+                                                )}
                                                 {checkinWarning.includes('Please register first') && (
                                                     <button
                                                         type="button"
@@ -1503,6 +1743,165 @@ export default function FeedbackForm() {
                                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                             ) : (
                                                 'Complete Check-in'
+                                            )}
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Time Out Flow */}
+                        {flowType === 'timeout' && !showThankYou && !showCoverPage && (
+                            <div className="animate-in fade-in duration-300 max-w-lg mx-auto my-6 bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-xl shadow-slate-100/30">
+                                {/* Step 0: Enter Code or Scan QR */}
+                                {timeoutStep === 0 && (
+                                    <>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <button onClick={() => { setShowCoverPage(true); setFlowType(null); }} className="text-slate-400 hover:text-slate-600 p-1 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                                <ChevronLeft size={16} />
+                                            </button>
+                                            <span className="text-[10px] font-black text-[#7030a0] uppercase tracking-wider">Visitor Departure</span>
+                                        </div>
+                                        <h3 className="text-xl font-extrabold text-slate-800 mb-2">Record Time Out</h3>
+                                        <p className="text-slate-500 text-xs font-semibold leading-relaxed mb-6">Scan your Access Pass QR code or enter your 5-digit Visitor Code / Email to record your departure.</p>
+
+                                        <div className="space-y-4 mb-6">
+                                            <div>
+                                                <label className="block text-slate-700 text-xs font-bold mb-2">Code ID or Email Address</label>
+                                                <div className="relative flex items-center">
+                                                    <input
+                                                        type="text"
+                                                        value={timeoutInput}
+                                                        onChange={(e) => setTimeoutInput(e.target.value)}
+                                                        placeholder="e.g. 54321 or name@region1.dost.gov.ph"
+                                                        className="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-[#7030a0] focus:ring-4 focus:ring-violet-100 focus:bg-white transition-all text-slate-700"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={showScanner && scannerTargetRef.current === 'timeout' ? stopScanner : () => startScanner('timeout')}
+                                                        className={`absolute right-2.5 p-2 rounded-lg transition-all ${showScanner && scannerTargetRef.current === 'timeout' ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-violet-50 text-[#7030a0] hover:bg-violet-100'}`}
+                                                        title={showScanner ? 'Close Scanner' : 'Scan QR Code'}
+                                                    >
+                                                        <Camera size={18} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {showScanner && scannerTargetRef.current === 'timeout' && (
+                                            <div className="mb-6 overflow-hidden rounded-2xl border border-violet-200 relative aspect-video bg-black flex items-center justify-center shadow-inner">
+                                                <video
+                                                    ref={videoRef}
+                                                    className="w-full h-full object-cover"
+                                                    autoPlay
+                                                    playsInline
+                                                    muted
+                                                />
+                                                {scannerLoading ? (
+                                                    <div className="absolute inset-0 bg-black flex flex-col items-center justify-center text-white text-xs font-semibold gap-2 z-10">
+                                                        <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                        <span>Starting camera...</span>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="absolute inset-0 border-[20px] sm:border-[30px] border-black/40 flex items-center justify-center pointer-events-none">
+                                                            <div className="w-32 h-32 sm:w-40 sm:h-40 border-2 border-[#7030a0] rounded-xl relative">
+                                                                <div className="absolute top-0 left-0 right-0 h-0.5 bg-pink-500 animate-scan shadow-[0_0_8px_#ec4899]" />
+                                                                <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-pink-500 -mt-0.5 -ml-0.5" />
+                                                                <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-pink-500 -mt-0.5 -mr-0.5" />
+                                                                <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-pink-500 -mb-0.5 -ml-0.5" />
+                                                                <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-pink-500 -mb-0.5 -mr-0.5" />
+                                                            </div>
+                                                        </div>
+                                                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm text-[9px] text-white px-2.5 py-1 rounded-full font-bold tracking-wider uppercase pointer-events-none">
+                                                            Align QR code within box
+                                                        </div>
+                                                    </>
+                                                )}
+                                                <canvas ref={canvasRef} className="hidden" />
+                                            </div>
+                                        )}
+
+                                        <button
+                                            onClick={handleVerifyTimeoutVisitor}
+                                            disabled={isVerifyingTimeout}
+                                            className="w-full py-3.5 bg-gradient-to-r from-violet-600 to-[#7030a0] text-white rounded-xl font-bold hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 text-sm"
+                                        >
+                                            {isVerifyingTimeout ? (
+                                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                'Verify & Proceed'
+                                            )}
+                                        </button>
+
+                                        {timeoutWarning && (
+                                            <div className="mt-4 p-4 bg-amber-50 border border-amber-250/60 rounded-2xl flex items-start gap-2.5 text-left text-amber-900 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                                                <span className="text-xs font-semibold leading-relaxed">{timeoutWarning}</span>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+                                {/* Step 1: Confirm Departure */}
+                                {timeoutStep === 1 && verifiedTimeoutVisitor && (
+                                    <>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <button onClick={() => setTimeoutStep(0)} className="text-slate-400 hover:text-slate-600 p-1 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                                <ChevronLeft size={16} />
+                                            </button>
+                                            <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Visitor Located</span>
+                                        </div>
+                                        <h3 className="text-xl font-extrabold text-slate-800 mb-1">Confirm Departure</h3>
+                                        <p className="text-slate-500 text-xs font-semibold leading-relaxed mb-6">Review your visit details and confirm your departure time.</p>
+
+                                        {/* Visit Summary Card */}
+                                        <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-6 text-left space-y-3">
+                                            <div>
+                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Visitor Name</span>
+                                                <span className="text-sm font-extrabold text-slate-800">{verifiedTimeoutVisitor.parent_name}</span>
+                                            </div>
+                                            {verifiedTimeoutVisitor.service_availed && (
+                                                <div>
+                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Service Availed</span>
+                                                    <span className="text-xs font-extrabold text-[#7030a0]">{verifiedTimeoutVisitor.service_availed}</span>
+                                                </div>
+                                            )}
+                                            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-slate-200/60">
+                                                <div>
+                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Time In</span>
+                                                    <span className="text-xs font-bold text-slate-700">
+                                                        {new Date(verifiedTimeoutVisitor.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Current Time</span>
+                                                    <span className="text-xs font-bold text-slate-700">
+                                                        {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                                                <span className="text-xs font-black text-slate-600">Calculated Stay Duration</span>
+                                                <span className="inline-flex items-center px-2 py-0.5 bg-violet-100 text-[#7030a0] rounded-lg text-xs font-black">
+                                                    <Clock size={12} className="mr-1" />
+                                                    {formatDuration(verifiedTimeoutVisitor.created_at, new Date().toISOString())}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={handleConfirmTimeout}
+                                            disabled={isSubmittingTimeout}
+                                            className="w-full py-3.5 bg-gradient-to-r from-violet-600 to-[#7030a0] text-white rounded-xl font-bold hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 text-sm"
+                                        >
+                                            {isSubmittingTimeout ? (
+                                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                <>
+                                                    <LogOut size={16} />
+                                                    Confirm Time Out & Exit
+                                                </>
                                             )}
                                         </button>
                                     </>

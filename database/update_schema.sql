@@ -6,7 +6,8 @@ ALTER TABLE public.registrations
   ADD COLUMN IF NOT EXISTS email text,
   ADD COLUMN IF NOT EXISTS birthdate date,
   ADD COLUMN IF NOT EXISTS client_type text,
-  ADD COLUMN IF NOT EXISTS activities text;
+  ADD COLUMN IF NOT EXISTS activities text,
+  ADD COLUMN IF NOT EXISTS time_out timestamptz;
 
 -- Ensure permissions are still correct
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;

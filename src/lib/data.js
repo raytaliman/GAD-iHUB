@@ -222,7 +222,7 @@ export async function fetchAllRegistrations() {
     return { 
       ...r, 
       children,
-      time_out: evalItem ? evalItem.created_at : null,
+      time_out: r.time_out || (evalItem ? evalItem.created_at : null),
       eval_id: evalItem ? evalItem.id : null
     };
   });
@@ -252,6 +252,27 @@ export async function updateRegistration(id, fields) {
     .eq('id', id)
     .select()
     .single();
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Records a visitor's time_out timestamp in registrations.
+ *
+ * @async
+ * @param {string|number} id - The registration row ID.
+ * @param {string} [timeOutIso] - ISO timestamp string. Defaults to now.
+ * @returns {Promise<Object>} The updated registration record.
+ */
+export async function recordTimeOut(id, timeOutIso = new Date().toISOString()) {
+  if (!supabase) throw new Error('API connection is not configured.');
+  const { data, error } = await supabase
+    .from('registrations')
+    .update({ time_out: timeOutIso })
+    .eq('id', id)
+    .select()
+    .single();
+
   if (error) throw error;
   return data;
 }
