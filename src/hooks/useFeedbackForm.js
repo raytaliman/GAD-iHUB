@@ -132,16 +132,14 @@ export function useFeedbackForm() {
      * @returns {boolean} True if valid.
      */
     const validateChildrenInfo = () => {
-        const requiresChildren = formData.serviceAvailed === 'Child Minding Station' || formData.serviceAvailed === 'Mother and Child Care';
         const hasChildData = formData.children.some(c => (c.name || '').trim() || (c.age || '').trim() || (c.sex || '').trim());
         
-        if (requiresChildren || hasChildData) {
+        if (hasChildData) {
             if (formData.children.some(c => !(c.name || '').trim() || !(c.age || '').trim() || !(c.sex || '').trim())) {
                 triggerSnackbar('Please fill in all child details (Name, Age, and Sex).');
                 return false;
             }
         }
-        if (formData.serviceAvailed === 'Mother and Child Care' && !formData.activities.trim()) { triggerSnackbar('Please enter the activities.'); return false; }
         return true;
     };
 
@@ -187,8 +185,8 @@ export function useFeedbackForm() {
                 barangay: formData.barangay || null,
                 children: activeChildren,
                 date_of_use: formData.dateOfUse,
-                service_availed: formData.serviceAvailed || null,
-                activities: formData.activities || null,
+                service_availed: null,
+                activities: null,
             };
             const { error } = await supabase.from('registrations').insert([row]);
             if (error) throw error;
