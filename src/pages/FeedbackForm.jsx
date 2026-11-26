@@ -718,7 +718,14 @@ export default function FeedbackForm() {
                                 {/* Action Buttons */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                                     <button
-                                        onClick={() => { handleInputChange('serviceAvailed', 'Child Minding Station'); setFlowType('register'); setShowCoverPage(false); window.history.pushState({}, '', '/registration'); }}
+                                        onClick={() => {
+                                            if (!formData.serviceAvailed) {
+                                                handleInputChange('serviceAvailed', 'Child Minding Station');
+                                            }
+                                            setFlowType('register');
+                                            setShowCoverPage(false);
+                                            window.history.pushState({}, '', '/registration');
+                                        }}
                                         className="group bg-gradient-to-br from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2783] text-white p-5 rounded-3xl font-bold transition-all shadow-lg hover:shadow-violet-200 hover:shadow-xl active:scale-[0.98] text-left flex flex-col justify-between min-h-[145px] border border-transparent"
                                     >
                                         <div className="bg-white/10 p-2.5 rounded-2xl w-fit">
@@ -797,6 +804,9 @@ export default function FeedbackForm() {
                                         "All information is secure with us, handled privately in strict compliance with the Data Privacy Act of 2012."
                                     </p>
                                 </div>
+                                <div className="mt-3 text-center text-[10px] text-slate-300 font-mono tracking-wider">
+                                    DOST Innovation Hub for GAD • v1.1.0
+                                </div>
                             </div>
                         )}
 
@@ -838,7 +848,7 @@ export default function FeedbackForm() {
                                 ) : flowType === 'checkin' ? (
                                     <>
                                         <p className="text-slate-600 mb-4 text-sm">
-                                            You have successfully checked in for this service. Have a wonderful visit!
+                                            You have successfully recorded your Time In for <span className="font-extrabold text-[#7030a0]">{formData.serviceAvailed || 'this service'}</span>. Have a wonderful visit!
                                         </p>
                                         <div className="bg-violet-50 border border-violet-100/50 rounded-2xl p-4 mb-6 text-left">
                                             <p className="text-slate-700 text-xs leading-relaxed font-semibold">
@@ -1114,6 +1124,44 @@ export default function FeedbackForm() {
                                         <UserCircle className="text-[#7030a0]" size={22} />
                                         Part I. Basic Information
                                     </h3>
+
+                                    {/* Station / Service Selection */}
+                                    <div className="mb-6 p-4 rounded-2xl bg-slate-50/70 border border-slate-100 text-left">
+                                        <label className="block text-xs font-bold text-slate-700 mb-2">
+                                            Service / Station Availed for this Visit <span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                            {[
+                                                { label: 'Child Minding Station', emoji: '🧒', desc: 'Infant & toddler play area' },
+                                                { label: 'Mother and Child Care', emoji: '🤱', desc: 'Lactation & maternal room' },
+                                                { label: 'GAD Learning Resource Center', emoji: '📚', desc: 'Policy & resource center' }
+                                            ].map((stn) => {
+                                                const isSelected = (formData.serviceAvailed || 'Child Minding Station') === stn.label;
+                                                return (
+                                                    <button
+                                                        key={stn.label}
+                                                        type="button"
+                                                        onClick={() => handleInputChange('serviceAvailed', stn.label)}
+                                                        className={`flex items-start gap-2.5 p-3 rounded-xl border-2 transition-all text-left ${
+                                                            isSelected 
+                                                                ? 'border-[#7030a0] bg-white shadow-sm ring-2 ring-violet-100' 
+                                                                : 'border-slate-200 hover:border-slate-300 bg-white/60 hover:bg-white'
+                                                        }`}
+                                                    >
+                                                        <span className="text-2xl shrink-0 mt-0.5">{stn.emoji}</span>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className={`text-xs font-extrabold leading-tight ${isSelected ? 'text-[#7030a0]' : 'text-slate-800'}`}>
+                                                                {stn.label}
+                                                            </div>
+                                                            <div className="text-[10px] text-slate-400 font-medium mt-0.5 leading-snug">
+                                                                {stn.desc}
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
 
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1554,10 +1602,14 @@ export default function FeedbackForm() {
                                             <button onClick={() => { setShowCoverPage(true); setFlowType(null); setShowServicesModal(true); }} className="text-slate-400 hover:text-slate-600 p-1 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
                                                 <ChevronLeft size={16} />
                                             </button>
-                                            <span className="text-[10px] font-black text-[#7030a0] uppercase tracking-wider">Returning Visitor</span>
+                                            <span className="text-[10px] font-black text-[#7030a0] uppercase tracking-wider">
+                                                Returning Visitor {formData.serviceAvailed ? `• ${formData.serviceAvailed}` : ''}
+                                            </span>
                                         </div>
-                                        <h3 className="text-xl font-extrabold text-slate-800 mb-2">Check-in</h3>
-                                        <p className="text-slate-500 text-xs font-semibold leading-relaxed mb-6">Enter your 5-digit Visitor Code ID or registered Email Address to quickly check in.</p>
+                                        <h3 className="text-xl font-extrabold text-slate-800 mb-2">Check-in (Time In)</h3>
+                                        <p className="text-slate-500 text-xs font-semibold leading-relaxed mb-6">
+                                            Enter your 5-digit Visitor Code ID or registered Email Address to record your Time In {formData.serviceAvailed ? `for ${formData.serviceAvailed}` : ''}.
+                                        </p>
                                         
                                         <div className="space-y-4 mb-6">
                                             <div>
@@ -1963,7 +2015,7 @@ export default function FeedbackForm() {
                                                 <h4 className="font-extrabold text-slate-800 text-sm">{service.label}</h4>
                                                 <p className="text-slate-500 text-xs font-semibold leading-relaxed mt-1">{service.desc}</p>
                                                 <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-black text-[#7030a0] group-hover:underline">
-                                                    Register for this service &rarr;
+                                                    Time In for this service &rarr;
                                                 </div>
                                             </div>
                                         </div>

@@ -245,7 +245,7 @@ export default function Visitors() {
                       <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider">Visitor Code</th>
                       <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider">Parent / Guardian</th>
                       <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider">Children</th>
-                      <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider">Time In</th>
+                      <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider">Time In & Service</th>
                       <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider">Time Out</th>
                       <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider">Duration</th>
                       <th className="py-3 px-5 text-slate-400 font-extrabold text-[10px] uppercase tracking-wider text-center">Survey Status</th>
@@ -292,10 +292,32 @@ export default function Visitors() {
                             </div>
                           </td>
                           <td className="py-3.5 px-5">
-                            <p className="text-slate-700 font-bold text-xs">{formatTime(r.created_at)}</p>
-                            <p className="text-slate-400 text-[9px] font-semibold mt-0.5">
-                              {r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '–'}
-                            </p>
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-slate-800 font-extrabold text-xs">{formatTime(r.created_at)}</span>
+                                <span className="text-slate-400 text-[9px] font-semibold">
+                                  • {r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '–'}
+                                </span>
+                              </div>
+                              <div>
+                                {r.service_availed ? (
+                                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-extrabold border ${
+                                    r.service_availed.includes('Child Minding')
+                                      ? 'bg-violet-50 text-[#7030a0] border-violet-200/60'
+                                      : r.service_availed.includes('Mother')
+                                      ? 'bg-pink-50 text-pink-700 border-pink-200/60'
+                                      : 'bg-indigo-50 text-indigo-700 border-indigo-200/60'
+                                  }`}>
+                                    <span>
+                                      {r.service_availed.includes('Child Minding') ? '🧒' : r.service_availed.includes('Mother') ? '🤱' : '📚'}
+                                    </span>
+                                    <span className="truncate max-w-[170px]">{r.service_availed}</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-slate-400 italic">General Access</span>
+                                )}
+                              </div>
+                            </div>
                           </td>
                           <td className="py-3.5 px-5">
                             {r.time_out ? (

@@ -275,6 +275,9 @@ export default function Sidebar({ activeView, onViewChange, onNavigateToUsers, o
             <LogOut size={16} className="text-violet-300 group-hover:text-red-400 transition-colors" />
             <span>Log out</span>
           </button>
+          <div className="pt-1 pb-0.5 text-center text-[10px] text-violet-300/40 font-mono font-medium tracking-widest select-none">
+            v1.1.0
+          </div>
         </div>
       </aside>
       <SettingsModal

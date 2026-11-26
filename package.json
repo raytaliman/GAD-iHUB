@@ -1,13 +1,17 @@
 {
   "name": "csf-ihub-dashboard",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node run-api.js",
+    "email": "node server.js",
+    "backend": "concurrently -n \"api,email\" -c \"blue,yellow\" \"npm run server\" \"npm run email\"",
+    "dev:all": "concurrently -n \"frontend,backend\" -c \"green,blue\" \"npm run dev\" \"npm run server\""
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
@@ -23,6 +27,7 @@
     "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-toastify": "^11.2.0",
     "recharts": "^2.13.3"
   },
   "devDependencies": {
@@ -30,6 +35,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^10.0.7",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "vite": "^5.4.10"

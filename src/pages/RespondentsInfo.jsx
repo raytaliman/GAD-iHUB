@@ -157,7 +157,8 @@ function RespondentDetailsModal({ respondent: initialRespondent, allRespondents 
         time: new Date(r.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
         timeOut: r.time_out ? new Date(r.time_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : null,
         duration: r.created_at ? formatDuration(r.created_at, r.time_out) : null,
-        purpose: Array.isArray(r.children) && r.children.length > 0 ? 'Innovation Hub Access & GAD Childcare Support' : 'Innovation Hub Access',
+        serviceAvailed: r.service_availed || 'Child Minding Station',
+        purpose: r.service_availed || (Array.isArray(r.children) && r.children.length > 0 ? 'Innovation Hub Access & GAD Childcare Support' : 'Innovation Hub Access'),
         surveyAnswered: !!r.eval_id,
         children: Array.isArray(r.children) ? r.children.map(c => c.name).filter(Boolean) : [],
       }));
@@ -642,7 +643,14 @@ function RespondentDetailsModal({ respondent: initialRespondent, allRespondents 
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-400 border border-slate-200/50">No Survey</span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-500 font-semibold mt-1">{v.purpose}</p>
+                        <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-violet-50 text-[#7030a0] border border-violet-100">
+                            <span>
+                              {v.serviceAvailed.includes('Child Minding') ? '🧒' : v.serviceAvailed.includes('Mother') ? '🤱' : '📚'}
+                            </span>
+                            <span>{v.serviceAvailed}</span>
+                          </span>
+                        </div>
                         {v.children && v.children.length > 0 && (
                           <div className="mt-1.5 flex flex-wrap gap-1.5 items-center">
                             <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider">Children:</span>
