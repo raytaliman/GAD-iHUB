@@ -649,19 +649,6 @@ export default function FeedbackForm() {
                                     Your valuable feedback directly shapes the safe, supportive, and child-friendly GAD services we provide for women and children.
                                 </p>
                             </div>
-
-                            {/* Login Button */}
-                            <div className="flex justify-center animate-in fade-in duration-700">
-                                <button
-                                    onClick={() => {
-                                        window.history.pushState({}, '', '/login');
-                                        window.dispatchEvent(new PopStateEvent('popstate'));
-                                    }}
-                                    className="bg-white/15 hover:bg-white/25 border border-white/30 text-white px-8 py-2.5 rounded-2xl text-xs font-semibold tracking-wide transition-all shadow-lg shadow-violet-950/20 active:scale-95"
-                                >
-                                    Login
-                                </button>
-                            </div>
                         </div>
                     </div>
                     <div className="flex-1 flex flex-col h-full lg:max-h-screen overflow-hidden bg-[#FAF9FC]">

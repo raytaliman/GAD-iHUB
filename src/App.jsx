@@ -54,16 +54,17 @@ export default function App() {
   useEffect(() => {
     const validAdminPaths = Object.keys(pathToView);
     const publicPaths = ['/', '/feedback', '/registration'];
+    const authPaths = ['/admin', '/login'];
 
     if (isAuthenticated) {
-      if (currentPath === '/login' || !([...validAdminPaths, ...publicPaths].includes(currentPath))) {
+      if (authPaths.includes(currentPath) || !([...validAdminPaths, ...publicPaths].includes(currentPath))) {
         const savedView = localStorage.getItem('csf-dashboard-active-view') || 'overview';
         const path = viewToPath[savedView] || '/dashboard';
         window.history.pushState({}, '', path);
         setCurrentPath(path);
       }
     } else {
-      if (!['/login', ...publicPaths].includes(currentPath)) {
+      if (![...authPaths, ...publicPaths].includes(currentPath)) {
         window.history.pushState({}, '', '/');
         setCurrentPath('/');
       }
@@ -95,7 +96,7 @@ export default function App() {
     return <FeedbackForm />;
   }
 
-  if (!isAuthenticated || currentPath === '/login') {
+  if (!isAuthenticated || currentPath === '/admin' || currentPath === '/login') {
     return <Login onLogin={handleLogin} />;
   }
 
