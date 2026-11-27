@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import Login from './pages/Login';
-import FeedbackForm from './pages/FeedbackForm';
+import LandingPage from './pages/LandingPage';
 import { useAuth } from './hooks/useAuth';
 
 const pathToView = {
@@ -93,7 +93,7 @@ export default function App() {
   };
 
   if (currentPath === '/' || currentPath === '/feedback' || currentPath === '/registration') {
-    return <FeedbackForm />;
+    return <LandingPage />;
   }
 
   if (!isAuthenticated || currentPath === '/admin' || currentPath === '/login') {
