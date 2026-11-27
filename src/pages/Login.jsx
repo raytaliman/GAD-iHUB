@@ -88,86 +88,86 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col justify-between items-center py-6 px-4 relative bg-[#7030a0] overflow-hidden font-sans select-none">
+    <div className="min-h-[100dvh] w-full flex flex-col justify-between items-center py-4 sm:py-6 px-3.5 sm:px-4 relative bg-[#7030a0] overflow-x-hidden overflow-y-auto font-sans select-none">
 
       {/* Dynamic Ambient Floating Decorative Elements in Varied Sizes */}
       {/* Top Left Quadrant */}
-      <div className="absolute top-4 left-6 text-white/15 pointer-events-none animate-float">
-        <Sparkles size={46} />
+      <div className="absolute top-4 left-6 text-white/15 pointer-events-none animate-float hidden xs:block">
+        <Sparkles size={40} className="sm:w-[46px] sm:h-[46px]" />
       </div>
-      <div className="absolute top-24 left-[14%] text-white/10 pointer-events-none animate-float-delayed">
+      <div className="absolute top-20 sm:top-24 left-[14%] text-white/10 pointer-events-none animate-float-delayed">
         <Heart size={20} />
       </div>
-      <div className="absolute top-8 left-[28%] text-white/10 pointer-events-none animate-bounce-subtle">
+      <div className="absolute top-8 left-[28%] text-white/10 pointer-events-none animate-bounce-subtle hidden sm:block">
         <Baby size={28} />
       </div>
 
       {/* Top Right Quadrant */}
-      <div className="absolute top-6 right-8 text-white/15 pointer-events-none animate-float-delayed">
-        <Heart size={52} />
+      <div className="absolute top-6 right-8 text-white/15 pointer-events-none animate-float-delayed hidden xs:block">
+        <Heart size={44} className="sm:w-[52px] sm:h-[52px]" />
       </div>
-      <div className="absolute top-24 right-[16%] text-white/10 pointer-events-none animate-float">
+      <div className="absolute top-20 sm:top-24 right-[16%] text-white/10 pointer-events-none animate-float">
         <Sparkles size={22} />
       </div>
-      <div className="absolute top-10 right-[30%] text-white/10 pointer-events-none animate-bounce-subtle">
+      <div className="absolute top-10 right-[30%] text-white/10 pointer-events-none animate-bounce-subtle hidden sm:block">
         <Baby size={24} />
       </div>
 
       {/* Middle Sides */}
-      <div className="absolute top-[42%] left-4 sm:left-10 text-white/15 pointer-events-none animate-bounce-subtle">
-        <Baby size={40} />
+      <div className="absolute top-[42%] left-3 sm:left-10 text-white/15 pointer-events-none animate-bounce-subtle">
+        <Baby size={32} className="sm:w-[40px] sm:h-[40px]" />
       </div>
-      <div className="absolute top-[52%] left-[16%] text-white/10 pointer-events-none animate-float">
+      <div className="absolute top-[52%] left-[16%] text-white/10 pointer-events-none animate-float hidden sm:block">
         <Sparkles size={18} />
       </div>
-      <div className="absolute top-[38%] right-5 sm:right-12 text-white/15 pointer-events-none animate-float">
-        <Sparkles size={34} />
+      <div className="absolute top-[38%] right-4 sm:right-12 text-white/15 pointer-events-none animate-float">
+        <Sparkles size={28} className="sm:w-[34px] sm:h-[34px]" />
       </div>
-      <div className="absolute top-[55%] right-[14%] text-white/10 pointer-events-none animate-float-delayed">
+      <div className="absolute top-[55%] right-[14%] text-white/10 pointer-events-none animate-float-delayed hidden sm:block">
         <Heart size={24} />
       </div>
 
       {/* Bottom Left Quadrant */}
-      <div className="absolute bottom-8 left-6 text-white/15 pointer-events-none animate-bounce-subtle">
-        <Heart size={38} />
+      <div className="absolute bottom-8 left-6 text-white/15 pointer-events-none animate-bounce-subtle hidden xs:block">
+        <Heart size={34} className="sm:w-[38px] sm:h-[38px]" />
       </div>
-      <div className="absolute bottom-24 left-[12%] text-white/10 pointer-events-none animate-float-delayed">
-        <Baby size={48} />
+      <div className="absolute bottom-20 sm:bottom-24 left-[12%] text-white/10 pointer-events-none animate-float-delayed hidden sm:block">
+        <Baby size={44} className="sm:w-[48px] sm:h-[48px]" />
       </div>
       <div className="absolute bottom-10 left-[26%] text-white/10 pointer-events-none animate-float">
         <Sparkles size={18} />
       </div>
 
       {/* Bottom Right Quadrant */}
-      <div className="absolute bottom-6 right-8 text-white/15 pointer-events-none animate-float-delayed">
-        <Baby size={38} />
+      <div className="absolute bottom-6 right-8 text-white/15 pointer-events-none animate-float-delayed hidden xs:block">
+        <Baby size={32} className="sm:w-[38px] sm:h-[38px]" />
       </div>
-      <div className="absolute bottom-24 right-[12%] text-white/10 pointer-events-none animate-float">
-        <Sparkles size={48} />
+      <div className="absolute bottom-20 sm:bottom-24 right-[12%] text-white/10 pointer-events-none animate-float hidden sm:block">
+        <Sparkles size={44} className="sm:w-[48px] sm:h-[48px]" />
       </div>
       <div className="absolute bottom-10 right-[25%] text-white/10 pointer-events-none animate-bounce-subtle">
         <Heart size={22} />
       </div>
 
       {/* Main Content Area */}
-      <div className="w-full flex-1 flex flex-col items-center justify-center relative z-10 max-w-sm my-auto">
+      <div className="w-full flex-1 flex flex-col items-center justify-center relative z-10 max-w-[390px] my-auto py-2 sm:py-4">
 
         {/* Dual Logos: starts bigger & centered, shrinks and slides up first */}
         <div
-          className={`flex items-center justify-center gap-4 transition-all duration-500 ease-out ${revealed
-            ? 'translate-y-0 scale-100 mb-3'
-            : 'translate-y-48 sm:translate-y-60 scale-[1.8] sm:scale-[1.9] mb-0'
+          className={`flex items-center justify-center gap-3 sm:gap-4 transition-all duration-500 ease-out ${revealed
+            ? 'translate-y-0 scale-100 mb-2 sm:mb-3'
+            : 'translate-y-36 sm:translate-y-48 md:translate-y-52 scale-125 sm:scale-150 md:scale-[1.75] mb-0'
             }`}
         >
           <img
             src={dostLogo}
             alt="DOST Logo"
-            className="h-18 sm:h-20 w-auto object-contain drop-shadow-md"
+            className="h-12 w-auto sm:h-14 md:h-16 object-contain drop-shadow-md"
           />
           <img
             src={ihubLogo}
             alt="iHub GAD Emblem"
-            className="h-18 w-18 sm:h-20 sm:w-20 rounded-full object-cover drop-shadow-md"
+            className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-full object-cover drop-shadow-md"
           />
         </div>
 
@@ -179,19 +179,19 @@ export default function Login({ onLogin }) {
             }`}
         >
           {/* Top Header Branding */}
-          <div className="flex flex-col items-center mb-4 text-center">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wide drop-shadow-md">
+          <div className="flex flex-col items-center mb-3 sm:mb-4 text-center px-2">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wide drop-shadow-md">
               iHubGAD
             </h1>
-            <p className="text-violet-100/90 text-[10.5px] sm:text-xs font-semibold tracking-wider mt-0.5 drop-shadow-sm">
+            <p className="text-violet-100/90 text-[10px] sm:text-xs font-semibold tracking-wider mt-0.5 drop-shadow-sm max-w-[280px] sm:max-w-none">
               Innovation Hub for Gender and Development
             </p>
           </div>
 
           {/* Compact Center Sign In Card */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-white/20 w-full max-w-[365px]">
-            <div className="text-center mb-5">
-              <h2 className="text-xl font-black text-slate-800 tracking-tight">Sign In</h2>
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-2xl border border-white/20 w-full max-w-[365px]">
+            <div className="text-center mb-4 sm:mb-5">
+              <h2 className="text-lg sm:text-xl font-black text-slate-800 tracking-tight">Sign In</h2>
               <p className="text-slate-500 text-[11px] mt-0.5 font-medium">Enter your credentials or use Microsoft 365</p>
             </div>
 
@@ -214,7 +214,7 @@ export default function Login({ onLogin }) {
                   placeholder="jnboquiren@region1.dost.gov.ph"
                   required
                   disabled={loading}
-                  className="w-full bg-[#edf2f9] text-slate-800 text-xs font-semibold rounded-xl pl-10 pr-3.5 py-3 border border-transparent focus:border-[#7030a0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all placeholder:text-slate-400"
+                  className="w-full bg-[#edf2f9] text-slate-800 text-sm sm:text-xs font-semibold rounded-xl pl-10 pr-3.5 py-2.5 sm:py-3 border border-transparent focus:border-[#7030a0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all placeholder:text-slate-400"
                 />
               </div>
 
@@ -229,13 +229,13 @@ export default function Login({ onLogin }) {
                   placeholder="••••••••••••"
                   required
                   disabled={loading}
-                  className="w-full bg-[#edf2f9] text-slate-800 text-xs font-semibold rounded-xl pl-10 pr-3.5 py-3 border border-transparent focus:border-[#7030a0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all placeholder:text-slate-400 tracking-wider"
+                  className="w-full bg-[#edf2f9] text-slate-800 text-sm sm:text-xs font-semibold rounded-xl pl-10 pr-3.5 py-2.5 sm:py-3 border border-transparent focus:border-[#7030a0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all placeholder:text-slate-400 tracking-wider"
                 />
               </div>
 
               {/* Show Password Toggle Checkbox */}
               <div className="pt-0.5">
-                <label className="inline-flex items-center gap-2 cursor-pointer select-none text-[11px] text-slate-600 font-medium hover:text-slate-800 transition-colors">
+                <label className="inline-flex items-center gap-2 cursor-pointer select-none text-[11px] text-slate-600 font-medium hover:text-slate-800 transition-colors py-0.5">
                   <input
                     type="checkbox"
                     checked={showPassword}
@@ -250,7 +250,7 @@ export default function Login({ onLogin }) {
               <button
                 type="submit"
                 disabled={loading || !email || !password}
-                className="w-full mt-2.5 bg-[#7030a0] hover:bg-[#5b2484] active:scale-[0.99] text-white font-extrabold text-xs tracking-wider py-3 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase"
+                className="w-full mt-2 sm:mt-2.5 bg-[#7030a0] hover:bg-[#5b2484] active:scale-[0.99] text-white font-extrabold text-xs tracking-wider py-3 min-h-[44px] rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -263,7 +263,7 @@ export default function Login({ onLogin }) {
               </button>
 
               {/* Divider */}
-              <div className="relative flex items-center justify-center my-3.5 pt-0.5">
+              <div className="relative flex items-center justify-center my-3 sm:my-3.5 pt-0.5">
                 <div className="border-t border-slate-200 w-full" />
                 <span className="bg-white px-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider absolute">
                   OR
@@ -274,7 +274,7 @@ export default function Login({ onLogin }) {
               <button
                 type="button"
                 onClick={handleMicrosoftSignIn}
-                className="w-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3.5 rounded-xl flex items-center justify-center gap-2.5 transition-all active:scale-[0.99] shadow-sm"
+                className="w-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold py-2.5 sm:py-3 px-3.5 min-h-[44px] rounded-xl flex items-center justify-center gap-2.5 transition-all active:scale-[0.99] shadow-sm cursor-pointer"
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 21 21">
                   <rect x="1" y="1" width="9" height="9" fill="#f25022" />
@@ -295,13 +295,13 @@ export default function Login({ onLogin }) {
           </div>
 
           {/* Return to Public Registration Form */}
-          <div className="mt-3 text-center">
+          <div className="mt-2.5 sm:mt-3 text-center">
             <button
               onClick={() => {
                 window.history.pushState({}, '', '/');
                 window.dispatchEvent(new PopStateEvent('popstate'));
               }}
-              className="text-violet-200 hover:text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors drop-shadow-sm py-1 px-3 rounded-lg hover:bg-white/10"
+              className="text-violet-200 hover:text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors drop-shadow-sm py-1.5 px-3 rounded-lg hover:bg-white/10"
             >
               <ChevronLeft size={14} />
               <span>Back to Public Kiosk</span>
@@ -312,10 +312,10 @@ export default function Login({ onLogin }) {
       </div>
 
       {/* Footer */}
-      <footer className={`text-center text-violet-200/90 text-xs font-medium mt-4 space-y-0.5 drop-shadow-sm relative z-10 transition-all duration-500 ease-out ${revealed ? 'delay-500 opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+      <footer className={`text-center text-violet-200/90 text-xs font-medium py-2 sm:mt-4 space-y-0.5 drop-shadow-sm relative z-10 transition-all duration-500 ease-out ${revealed ? 'delay-500 opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
         }`}>
-        <p>Developed by DOST Ilocos Region - ITSM Unit</p>
-        <p className="text-[10px] text-violet-200/70 font-semibold tracking-wider">V 1.1.0</p>
+        <p className="text-[11px] sm:text-xs">Developed by DOST Ilocos Region - ITSM Unit</p>
+        <p className="text-[9px] sm:text-[10px] text-violet-200/70 font-semibold tracking-wider">V 1.1.0</p>
       </footer>
     </div>
   );
