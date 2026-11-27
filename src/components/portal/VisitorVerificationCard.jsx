@@ -139,7 +139,7 @@ export default function VisitorVerificationCard({
 
                     {/* Warning Prompt */}
                     {verificationWarning && (
-                        <div className="mt-3.5 p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col items-start gap-2 text-left text-amber-900 animate-in fade-in duration-200">
+                        <div className="text-center mt-3.5 p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col items-start gap-2 text-amber-900 animate-in fade-in duration-200">
                             <div className="flex items-start gap-2">
                                 <AlertCircle size={15} className="text-amber-600 shrink-0 mt-0.5" />
                                 <span className="text-xs font-semibold leading-relaxed">{verificationWarning}</span>
@@ -147,7 +147,7 @@ export default function VisitorVerificationCard({
                             <button
                                 type="button"
                                 onClick={onRegisterClick}
-                                className="px-3.5 py-1.5 bg-[#7030a0] hover:bg-[#5b2783] text-white rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
+                                className="px-3.5 py-1.5 bg-[#7030a0] hover:bg-[#5b2783] text-white rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer mx-auto"
                             >
                                 Register Now (First Entry) →
                             </button>
@@ -289,12 +289,9 @@ export default function VisitorVerificationCard({
                             <ChevronLeft size={15} />
                             <span>Back</span>
                         </button>
-                        <span className="text-[10px] font-black text-violet-700 bg-violet-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                            Active Check-In Found
-                        </span>
                     </div>
 
-                    <div className="text-left mb-4">
+                    <div className="text-center mb-4">
                         <span className="text-[11px] font-extrabold text-[#7030a0] uppercase tracking-wider block mb-0.5">
                             Welcome back, {activeVisitorProfile.parent_name}!
                         </span>
@@ -393,7 +390,7 @@ export default function VisitorVerificationCard({
                     </div>
 
                     <p className="text-[11px] text-slate-400 font-medium mb-4 leading-relaxed">
-                        When you are ready to depart, simply enter your code <span className="font-bold text-slate-700">{timeInSuccessData.code}</span> again to record your Time Out and evaluate our service.
+                        When you are ready to depart, simply enter your code again to record your Time Out and evaluate our service.
                     </p>
 
                     <button
@@ -401,15 +398,15 @@ export default function VisitorVerificationCard({
                         onClick={onResetPortal}
                         className="w-full py-3 bg-[#7030a0] hover:bg-[#5b2484] text-white rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer"
                     >
-                        Done / Return to Home
+                        Return to Home
                     </button>
                 </div>
             )}
 
-            {/* BOTTOM HELPER PROMPT */}
-            <div className="mt-4 sm:mt-5 text-center space-y-1.5">
+            {/* FIRST TIME REGISTRATION PROMPT */}
+            <div className="mt-4 sm:mt-5 text-center">
                 <p className="text-xs sm:text-sm text-violet-200 font-medium">
-                    Click{' '}
+                    First Time? Click {' '}
                     <button
                         type="button"
                         onClick={onRegisterClick}
@@ -417,16 +414,8 @@ export default function VisitorVerificationCard({
                     >
                         here
                     </button>{' '}
-                    or the register button at the top if this is your first time
+                    to register
                 </p>
-
-                <a
-                    href="#services"
-                    className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-violet-200/80 hover:text-white transition-colors py-0.5 cursor-pointer"
-                >
-                    <span>Don't know the system? Know more by scrolling</span>
-                    <ChevronDown size={14} className="animate-bounce" />
-                </a>
             </div>
         </div>
     );

@@ -357,7 +357,7 @@ export function useFeedbackForm() {
         resetForm,
         validateBasicInfo,
         validateChildrenInfo,
-        totalParts: formParts.length + 2,
+        totalParts: formParts.length + 1,
         snackbar,
         setSnackbar,
         triggerSnackbar,

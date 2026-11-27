@@ -19,11 +19,11 @@ export default function EvaluationFormView({
     const [showBackConfirm, setShowBackConfirm] = useState(false);
 
     const goNext = () => {
-        if (currentPart === totalParts - 1) { 
-            submitEvaluation(); 
-        } else { 
-            setCurrentPart(p => Math.min(p + 1, totalParts - 1)); 
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        if (currentPart === totalParts) {
+            submitEvaluation();
+        } else {
+            setCurrentPart(p => Math.min(p + 1, totalParts));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
@@ -49,9 +49,6 @@ export default function EvaluationFormView({
                             <ChevronLeft size={16} />
                             <span>Back to Portal</span>
                         </button>
-                        <span className="text-[11px] font-black text-violet-700 bg-violet-100 px-3 py-1 rounded-full uppercase tracking-wider">
-                            CSM Evaluation Survey
-                        </span>
                     </div>
                 )}
                 {/* Thank You Screen for Evaluation */}
@@ -67,7 +64,7 @@ export default function EvaluationFormView({
                             Thank You for Your Feedback!
                         </h3>
                         <p className="text-slate-600 text-xs sm:text-sm font-medium mb-6 leading-relaxed">
-                            Your departure has been recorded and your valuable insights will directly help us improve our services for women and children at DOST Region 1.
+                            Your departure has been recorded and your valuable insights will directly help us improve our services for women and children at DOST Ilocos Region.
                         </p>
 
                         <button
@@ -82,15 +79,11 @@ export default function EvaluationFormView({
                     <>
                         {/* Survey Header Banner */}
                         <div className="text-center mb-8 max-w-2xl mx-auto">
-                            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-violet-100 text-[#7030a0] rounded-full text-xs font-black tracking-wider uppercase mb-3">
-                                <Sparkles size={13} />
-                                <span>Client Satisfaction Measurement (CSM)</span>
-                            </div>
                             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-2">
                                 Service Evaluation Survey
                             </h1>
                             <p className="text-slate-500 text-xs sm:text-sm font-medium leading-relaxed">
-                                Your honest feedback helps DOST Region 1 maintain a safe, welcoming, and empowering environment for all women and children.
+                                Your honest feedback helps DOST Ilocos region maintain a safe, welcoming, and empowering environment for all women and children.
                             </p>
                         </div>
 
@@ -106,13 +99,12 @@ export default function EvaluationFormView({
                                 {Array.from({ length: totalParts }).map((_, idx) => (
                                     <div
                                         key={idx}
-                                        className={`h-2 rounded-full flex-1 transition-all duration-300 ${
-                                            idx + 1 === currentPart
-                                                ? 'bg-[#7030a0]'
-                                                : idx + 1 < currentPart
+                                        className={`h-2 rounded-full flex-1 transition-all duration-300 ${idx + 1 === currentPart
+                                            ? 'bg-[#7030a0]'
+                                            : idx + 1 < currentPart
                                                 ? 'bg-violet-300'
                                                 : 'bg-slate-200'
-                                        }`}
+                                            }`}
                                     />
                                 ))}
                             </div>
@@ -174,11 +166,10 @@ export default function EvaluationFormView({
                                                                     key={opt.value}
                                                                     type="button"
                                                                     onClick={() => handleInputChange(q.key, opt.value)}
-                                                                    className={`group flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all cursor-pointer ${
-                                                                        isSelected
-                                                                            ? 'bg-white shadow-md ring-2 ring-[#7030a0] scale-105'
-                                                                            : 'hover:bg-white hover:shadow-sm'
-                                                                    }`}
+                                                                    className={`group flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all cursor-pointer ${isSelected
+                                                                        ? 'bg-white shadow-md ring-2 ring-[#7030a0] scale-105'
+                                                                        : 'hover:bg-white hover:shadow-sm'
+                                                                        }`}
                                                                 >
                                                                     <div className="relative">
                                                                         <span className="text-2xl sm:text-3xl block group-hover:scale-110 transition-transform">
@@ -190,9 +181,8 @@ export default function EvaluationFormView({
                                                                             </div>
                                                                         )}
                                                                     </div>
-                                                                    <span className={`text-[9px] sm:text-[10px] font-bold text-center leading-tight ${
-                                                                        isSelected ? 'text-[#7030a0] font-black' : 'text-slate-500'
-                                                                    }`}>
+                                                                    <span className={`text-[9px] sm:text-[10px] font-bold text-center leading-tight ${isSelected ? 'text-[#7030a0] font-black' : 'text-slate-500'
+                                                                        }`}>
                                                                         {opt.label}
                                                                     </span>
                                                                 </button>
@@ -208,11 +198,10 @@ export default function EvaluationFormView({
                                                                     key={opt.label}
                                                                     type="button"
                                                                     onClick={() => handleInputChange(q.key, opt.label)}
-                                                                    className={`w-full flex items-center gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer ${
-                                                                        isSelected
-                                                                            ? `${opt.activeBg} border-[#7030a0] ring-2 ring-[#7030a0] shadow-sm font-bold`
-                                                                            : 'border-slate-200 hover:bg-slate-50 text-slate-700'
-                                                                    }`}
+                                                                    className={`w-full flex items-center gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer ${isSelected
+                                                                        ? `${opt.activeBg} border-[#7030a0] ring-2 ring-[#7030a0] shadow-sm font-bold`
+                                                                        : 'border-slate-200 hover:bg-slate-50 text-slate-700'
+                                                                        }`}
                                                                 >
                                                                     <span className="text-2xl">{opt.emoji}</span>
                                                                     <span className="text-xs sm:text-sm font-bold text-slate-800">{opt.label}</span>

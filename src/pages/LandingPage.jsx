@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Heart, Baby, Shapes } from 'lucide-react';
+import { Sparkles, Heart, Baby, Shapes, ChevronDown } from 'lucide-react';
 import { useFeedbackForm } from '../hooks/useFeedbackForm';
 import { supabase } from '../lib/supabase';
 
@@ -614,6 +614,17 @@ export default function LandingPage() {
                         formatDuration={formatDuration}
                         timeInSuccessData={timeInSuccessData}
                     />
+                </div>
+
+                {/* Bottom of Section: Know More About Our Services */}
+                <div className="absolute bottom-3 sm:bottom-5 left-0 right-0 z-20 flex justify-center pointer-events-auto select-none">
+                    <a
+                        href="#services"
+                        className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-violet-200/90 hover:text-white transition-all py-1.5 px-4 rounded-full hover:bg-white/10 cursor-pointer group"
+                    >
+                        <span>Know more about our services</span>
+                        <ChevronDown size={16} className="animate-bounce text-pink-300 group-hover:text-white transition-colors" />
+                    </a>
                 </div>
             </section>
 
