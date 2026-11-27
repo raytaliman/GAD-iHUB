@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Sparkles, Heart, Baby, Shapes } from 'lucide-react';
 import { useFeedbackForm } from '../hooks/useFeedbackForm';
 import { supabase } from '../lib/supabase';
 
@@ -506,43 +507,114 @@ export default function LandingPage() {
             <PortalNavbar
                 onRegister={handleGoToRegister}
                 onTimeInOutShortcut={() => handleFocusVerification()}
+                onLogoClick={() => {
+                    handleResetPortal();
+                    const heroEl = document.getElementById('hero');
+                    if (heroEl) {
+                        heroEl.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                }}
             />
 
-            {/* SCREEN 1: HERO & VISITOR VERIFICATION (FITS EXACT SCREEN HEIGHT) */}
-            <section className="min-h-[calc(100vh-64px)] sm:min-h-[calc(100dvh-64px)] flex flex-col justify-between items-center px-4 pt-3 sm:pt-6 pb-6 w-full max-w-4xl mx-auto">
-                {/* 2. HERO HEADER SECTION */}
-                <PortalHero />
+            {/* SCREEN 1: HERO & VISITOR VERIFICATION WITH PURPLE BACKGROUND & FLOATING DECORATIONS */}
+            <section id="hero" className="min-h-[calc(100vh-64px)] sm:min-h-[calc(100dvh-64px)] w-full flex flex-col justify-center items-center py-6 sm:py-8 px-4 relative bg-[#7030a0] overflow-hidden select-none">
+                {/* Dynamic Ambient Floating Decorative Elements matching Login.jsx */}
+                {/* Top Left Quadrant */}
+                <div className="absolute top-6 left-8 text-white/15 pointer-events-none animate-float hidden xs:block">
+                    <Sparkles size={42} />
+                </div>
+                <div className="absolute top-20 left-[14%] text-white/10 pointer-events-none animate-float-delayed">
+                    <Heart size={22} />
+                </div>
+                <div className="absolute top-10 left-[26%] text-white/10 pointer-events-none animate-bounce-subtle hidden sm:block">
+                    <Baby size={30} />
+                </div>
 
-                {/* 3. CORE INTERACTIVE WORKSPACE (VERIFY -> SELECT SERVICE -> TIME OUT -> EVALUATION) */}
-                <VisitorVerificationCard
-                    portalFlowState={portalFlowState}
-                    portalCodeInput={portalCodeInput}
-                    setPortalCodeInput={setPortalCodeInput}
-                    codeInputRef={codeInputRef}
-                    isVerifyingCode={isVerifyingCode}
-                    verificationWarning={verificationWarning}
-                    showScanner={showScanner}
-                    startScanner={startScanner}
-                    stopScanner={stopScanner}
-                    scannerLoading={scannerLoading}
-                    videoRef={videoRef}
-                    canvasRef={canvasRef}
-                    onVerifyCode={handleVerifyPortalVisitor}
-                    onRegisterClick={handleGoToRegister}
-                    onResetPortal={handleResetPortal}
-                    activeVisitorProfile={activeVisitorProfile}
-                    selectedServiceForTimeIn={selectedServiceForTimeIn}
-                    setSelectedServiceForTimeIn={setSelectedServiceForTimeIn}
-                    selectedChildren={selectedChildren}
-                    setSelectedChildren={setSelectedChildren}
-                    isRecordingTimeIn={isRecordingTimeIn}
-                    onConfirmTimeIn={handleConfirmTimeIn}
-                    activeVisitRecord={activeVisitRecord}
-                    isRecordingTimeOut={isRecordingTimeOut}
-                    onConfirmTimeoutAndProceedToEval={handleConfirmTimeoutAndProceedToEval}
-                    formatDuration={formatDuration}
-                    timeInSuccessData={timeInSuccessData}
-                />
+                {/* Top Right Quadrant */}
+                <div className="absolute top-8 right-10 text-white/15 pointer-events-none animate-float-delayed hidden xs:block">
+                    <Heart size={46} />
+                </div>
+                <div className="absolute top-22 right-[16%] text-white/10 pointer-events-none animate-float">
+                    <Sparkles size={24} />
+                </div>
+                <div className="absolute top-12 right-[28%] text-white/10 pointer-events-none animate-bounce-subtle hidden sm:block">
+                    <Baby size={26} />
+                </div>
+
+                {/* Middle Sides */}
+                <div className="absolute top-[48%] left-4 sm:left-12 text-white/15 pointer-events-none animate-bounce-subtle">
+                    <Baby size={36} />
+                </div>
+                <div className="absolute top-[46%] right-4 sm:right-12 text-white/15 pointer-events-none animate-float">
+                    <Sparkles size={32} />
+                </div>
+                <div className="absolute top-[62%] left-[12%] text-white/10 pointer-events-none animate-float-delayed hidden sm:block">
+                    <Shapes size={32} />
+                </div>
+                <div className="absolute top-[64%] right-[14%] text-white/10 pointer-events-none animate-float-delayed hidden sm:block">
+                    <Heart size={26} />
+                </div>
+
+                {/* Bottom Left Quadrant */}
+                <div className="absolute bottom-8 left-8 text-white/15 pointer-events-none animate-bounce-subtle hidden xs:block">
+                    <Heart size={36} />
+                </div>
+                <div className="absolute bottom-16 left-[14%] text-white/10 pointer-events-none animate-float-delayed hidden sm:block">
+                    <Baby size={44} />
+                </div>
+                <div className="absolute bottom-8 left-[24%] text-white/10 pointer-events-none animate-float">
+                    <Sparkles size={20} />
+                </div>
+
+                {/* Bottom Right Quadrant */}
+                <div className="absolute bottom-8 right-10 text-white/15 pointer-events-none animate-float-delayed hidden xs:block">
+                    <Baby size={34} />
+                </div>
+                <div className="absolute bottom-16 right-[14%] text-white/10 pointer-events-none animate-float hidden sm:block">
+                    <Sparkles size={44} />
+                </div>
+                <div className="absolute bottom-6 right-[24%] text-white/10 pointer-events-none animate-bounce-subtle">
+                    <Heart size={24} />
+                </div>
+
+                {/* Centered Content: Hero + Verification Card + Prompt without large empty gap */}
+                <div className="relative z-10 w-full max-w-xl flex flex-col items-center">
+                    {/* 2. HERO HEADER SECTION */}
+                    <PortalHero />
+
+                    {/* 3. CORE INTERACTIVE WORKSPACE (VERIFY -> SELECT SERVICE -> TIME OUT -> EVALUATION) */}
+                    <VisitorVerificationCard
+                        portalFlowState={portalFlowState}
+                        portalCodeInput={portalCodeInput}
+                        setPortalCodeInput={setPortalCodeInput}
+                        codeInputRef={codeInputRef}
+                        isVerifyingCode={isVerifyingCode}
+                        verificationWarning={verificationWarning}
+                        showScanner={showScanner}
+                        startScanner={startScanner}
+                        stopScanner={stopScanner}
+                        scannerLoading={scannerLoading}
+                        videoRef={videoRef}
+                        canvasRef={canvasRef}
+                        onVerifyCode={handleVerifyPortalVisitor}
+                        onRegisterClick={handleGoToRegister}
+                        onResetPortal={handleResetPortal}
+                        activeVisitorProfile={activeVisitorProfile}
+                        selectedServiceForTimeIn={selectedServiceForTimeIn}
+                        setSelectedServiceForTimeIn={setSelectedServiceForTimeIn}
+                        selectedChildren={selectedChildren}
+                        setSelectedChildren={setSelectedChildren}
+                        isRecordingTimeIn={isRecordingTimeIn}
+                        onConfirmTimeIn={handleConfirmTimeIn}
+                        activeVisitRecord={activeVisitRecord}
+                        isRecordingTimeOut={isRecordingTimeOut}
+                        onConfirmTimeoutAndProceedToEval={handleConfirmTimeoutAndProceedToEval}
+                        formatDuration={formatDuration}
+                        timeInSuccessData={timeInSuccessData}
+                    />
+                </div>
             </section>
 
             {/* 4. SERVICES OFFERED OVERVIEW CARDS */}

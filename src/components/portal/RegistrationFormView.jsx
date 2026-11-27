@@ -34,6 +34,7 @@ export default function RegistrationFormView({
             <PortalNavbar
                 onRegister={() => {}}
                 onTimeInOutShortcut={onBackToPortal}
+                onLogoClick={onBackToPortal}
             />
 
             <main className="flex-1 flex flex-col items-center px-4 py-6 sm:py-10 max-w-4xl mx-auto w-full">

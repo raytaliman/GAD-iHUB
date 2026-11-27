@@ -33,6 +33,7 @@ export default function EvaluationFormView({
             <PortalNavbar
                 onRegister={onCompleteReturnHome}
                 onTimeInOutShortcut={() => setShowBackConfirm(true)}
+                onLogoClick={() => setShowBackConfirm(true)}
             />
 
             <main className="flex-1 flex flex-col items-center px-4 py-6 sm:py-10 max-w-4xl mx-auto w-full">
