@@ -519,7 +519,7 @@ export default function LandingPage() {
             />
 
             {/* SCREEN 1: HERO & VISITOR VERIFICATION WITH PURPLE BACKGROUND & FLOATING DECORATIONS */}
-            <section id="hero" className="min-h-[calc(100vh-64px)] sm:min-h-[calc(100dvh-64px)] w-full flex flex-col justify-center items-center py-6 sm:py-8 px-4 relative bg-[#7030a0] overflow-hidden select-none">
+            <section id="hero" className="min-h-screen w-full flex flex-col justify-center items-center pt-24 sm:pt-28 pb-8 sm:pb-12 px-4 relative bg-[#7030a0] overflow-hidden select-none">
                 {/* Dynamic Ambient Floating Decorative Elements matching Login.jsx */}
                 {/* Top Left Quadrant */}
                 <div className="absolute top-6 left-8 text-white/15 pointer-events-none animate-float hidden xs:block">

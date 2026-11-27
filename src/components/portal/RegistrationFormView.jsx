@@ -32,12 +32,13 @@ export default function RegistrationFormView({
         <div className="min-h-screen bg-[#FAF9FC] flex flex-col font-sans select-none text-slate-800">
             {/* Top Sticky Header - Stays identical to landing page */}
             <PortalNavbar
+                variant="light"
                 onRegister={() => {}}
                 onTimeInOutShortcut={onBackToPortal}
                 onLogoClick={onBackToPortal}
             />
 
-            <main className="flex-1 flex flex-col items-center px-4 py-6 sm:py-10 max-w-4xl mx-auto w-full">
+            <main className="flex-1 flex flex-col items-center px-4 pt-24 sm:pt-28 pb-6 sm:pb-10 max-w-4xl mx-auto w-full">
                 {/* Back to Portal Bar directly inside the form */}
                 {!showThankYou && (
                     <div className="w-full max-w-2xl mb-4 flex items-center justify-between">

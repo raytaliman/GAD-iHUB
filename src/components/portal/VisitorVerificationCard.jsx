@@ -168,12 +168,9 @@ export default function VisitorVerificationCard({
                             <ChevronLeft size={15} />
                             <span>Change Code</span>
                         </button>
-                        <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                            ✓ {activeVisitorProfile.parent_name}
-                        </span>
                     </div>
 
-                    <div className="text-left mb-4">
+                    <div className="text-center mb-4">
                         <h3 className="text-xl font-black text-slate-800 tracking-tight mb-0.5">
                             Select Service to Time In
                         </h3>
