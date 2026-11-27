@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Share, Calendar, Check, ChevronDown, ChevronLeft, ChevronRight, CheckCircle2, Smile, Meh, Frown, UserCircle, Building2, FileText, Heart, Sparkles, Baby, Palette, PartyPopper, Shapes, Star, Gift, Sun, Music, AlertCircle, X, Camera, Download, LogOut, Clock, ArrowRight } from 'lucide-react';
+import { Share, Calendar, Check, ChevronDown, ChevronLeft, ChevronRight, CheckCircle2, Smile, Meh, Frown, UserCircle, Building2, FileText, Heart, Sparkles, Baby, Palette, PartyPopper, Shapes, Star, Gift, Sun, Music, AlertCircle, X, Camera, Download, LogOut, Clock, ArrowRight, ShieldCheck, BookOpen, ExternalLink, HelpCircle } from 'lucide-react';
 import logo from '../assets/logo.png';
+import dostLogo from '../assets/dost_logo.png';
+import ihubLogo from '../assets/ihub_logo.png';
 import ModernSelect from '../components/common/ModernSelect';
 import ModernDatePicker from '../components/common/ModernDatePicker';
 import { useFeedbackForm } from '../hooks/useFeedbackForm';
@@ -64,6 +66,71 @@ export default function FeedbackForm() {
     const [showStationModal, setShowStationModal] = useState(false);
     const [showBackConfirm, setShowBackConfirm] = useState(false);
     const [showServicesModal, setShowServicesModal] = useState(false);
+    const [selectedLandingService, setSelectedLandingService] = useState(null);
+
+    const PORTAL_SERVICES = [
+        {
+            id: 'child-minding',
+            label: 'Child Minding Station',
+            badge: 'Hub Station 1',
+            emoji: '👶',
+            tagline: 'Child Play & Supervised Nursery Space',
+            desc: 'A secure, supervised, and fun play area equipped with child-friendly educational toys, books, and nursery amenities for infants and toddlers.',
+            features: ['Supervised Play Area', 'Educational Toys & Books', 'Nursery & Resting Amenities'],
+            accentColor: 'text-pink-600',
+            badgeBg: 'bg-pink-50 text-pink-700 border-pink-200/60',
+            cardHoverBorder: 'hover:border-pink-300',
+            iconBg: 'bg-pink-100 text-pink-600',
+        },
+        {
+            id: 'mother-child',
+            label: 'Mother and Child Care',
+            badge: 'Hub Station 2',
+            emoji: '🤱',
+            tagline: 'Lactation & Maternal Support Station',
+            desc: 'A quiet, private lactation room and care space designed for nursing mothers, diaper changes, and maternal support services.',
+            features: ['Private Lactation Room', 'Diaper Changing Station', 'Ergonomic Nursing Lounge'],
+            accentColor: 'text-[#7030a0]',
+            badgeBg: 'bg-violet-50 text-[#7030a0] border-violet-200/60',
+            cardHoverBorder: 'hover:border-violet-300',
+            iconBg: 'bg-violet-100 text-[#7030a0]',
+        },
+        {
+            id: 'gad-learning',
+            label: 'GAD Learning Resource Center',
+            badge: 'Hub Station 3',
+            emoji: '📚',
+            tagline: 'Knowledge & Gender Equality Library',
+            desc: 'A comprehensive library offering specialized Gender and Development literature, policy guidelines, and interactive resources promoting gender-responsive education.',
+            features: ['National GAD Policy Library', 'Gender Sensitivity Guides', 'Interactive Learning Modules'],
+            accentColor: 'text-blue-600',
+            badgeBg: 'bg-blue-50 text-blue-700 border-blue-200/60',
+            cardHoverBorder: 'hover:border-blue-300',
+            iconBg: 'bg-blue-100 text-blue-600',
+        }
+    ];
+
+    const handleSelectLandingService = (serviceLabel) => {
+        setSelectedLandingService(serviceLabel);
+        handleInputChange('serviceAvailed', serviceLabel);
+        setFlowType('checkin');
+        setCheckinStep(0);
+        setVerifiedVisitor(null);
+        setCheckinInput('');
+        setSelectedChildren([]);
+        setCheckinWarning('');
+    };
+
+    const handleBackToServices = () => {
+        setSelectedLandingService(null);
+        handleInputChange('serviceAvailed', '');
+        setCheckinInput('');
+        setCheckinWarning('');
+        setCheckinStep(0);
+        setVerifiedVisitor(null);
+        setSelectedChildren([]);
+        stopScanner();
+    };
     
     // Check-in Flow States
     const [checkinInput, setCheckinInput] = useState('');
@@ -586,8 +653,678 @@ export default function FeedbackForm() {
         else { setCurrentPart(p => Math.min(p + 1, totalParts - 1)); window.scrollTo(0, 0); }
     };
 
+    // ==========================================
+    // REDESIGNED FULL-WIDTH LANDING PAGE PORTAL
+    // ==========================================
+    if (showCoverPage) {
+        return (
+            <div className="min-h-screen bg-white flex flex-col font-sans select-none text-slate-800 scroll-smooth">
+                {/* 1. TOP NAVBAR */}
+                <header className="sticky top-0 z-50 bg-[#7030a0] shadow-md px-4 sm:px-8 py-3 flex items-center justify-between text-white transition-all">
+                    {/* Left: Dual Logo Branding matching mockup */}
+                    <div className="flex items-center gap-3">
+                        <img 
+                            src={dostLogo} 
+                            alt="DOST Logo" 
+                            className="h-10 sm:h-12 w-auto object-contain drop-shadow-md" 
+                        />
+                        <div className="bg-white px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full shadow-sm flex items-center gap-2">
+                            <img 
+                                src={ihubLogo} 
+                                alt="iHub GAD Emblem" 
+                                className="h-6 w-6 sm:h-7 sm:w-7 rounded-full object-cover" 
+                            />
+                            <span className="text-xs sm:text-sm font-black text-slate-900 tracking-tight">
+                                iHub<span className="text-[#7030a0]">GAD</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Right: Nav Links + Actions + REGISTER Button */}
+                    <div className="flex items-center gap-3 sm:gap-6">
+                        <nav className="hidden md:flex items-center gap-6 text-xs sm:text-sm font-bold text-violet-100">
+                            <a 
+                                href="#services" 
+                                onClick={() => {
+                                    if (selectedLandingService) {
+                                        handleBackToServices();
+                                    }
+                                }}
+                                className="hover:text-white transition-colors cursor-pointer"
+                            >
+                                Services
+                            </a>
+                            <a href="#about" className="hover:text-white transition-colors cursor-pointer">
+                                About
+                            </a>
+                            <a href="#contact" className="hover:text-white transition-colors cursor-pointer">
+                                Contact us
+                            </a>
+                        </nav>
+
+                        {/* Quick Departure / Evaluation Buttons */}
+                        <div className="hidden lg:flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setFlowType('timeout');
+                                    setShowCoverPage(false);
+                                    setTimeoutStep(0);
+                                    setTimeoutInput('');
+                                    setVerifiedTimeoutVisitor(null);
+                                    setTimeoutWarning('');
+                                }}
+                                className="text-violet-100 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                                title="Record Visitor Departure"
+                            >
+                                <LogOut size={13} />
+                                <span>Time Out</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setFlowType('evaluate');
+                                    setShowCoverPage(false);
+                                    setEvalStep(0);
+                                    setEvalVerifyInput('');
+                                    setVerifiedEvalVisitor(null);
+                                    setEvalVisits([]);
+                                    setEvalWarning('');
+                                    setCodeValidated(false);
+                                }}
+                                className="text-violet-100 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                                title="Evaluate Services & Staff"
+                            >
+                                <Sparkles size={13} />
+                                <span>Evaluate</span>
+                            </button>
+                        </div>
+
+                        {/* Prominent REGISTER button matching mockup */}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                handleInputChange('serviceAvailed', '');
+                                setFlowType('register');
+                                setShowCoverPage(false);
+                                window.history.pushState({}, '', '/registration');
+                            }}
+                            className="bg-white hover:bg-violet-50 text-[#7030a0] px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
+                        >
+                            REGISTER
+                        </button>
+                    </div>
+                </header>
+
+                {/* 2. HERO HEADER SECTION */}
+                <section className="pt-10 sm:pt-16 pb-6 sm:pb-10 px-4 text-center max-w-4xl mx-auto flex flex-col items-center animate-in fade-in duration-500">
+                    <span className="text-xs sm:text-sm font-extrabold tracking-widest text-[#7030a0] uppercase mb-1">
+                        Welcome to
+                    </span>
+                    <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-slate-900 tracking-tight leading-none mb-3.5">
+                        iHub<span className="text-[#7030a0]">GAD</span> Portal
+                    </h1>
+                    <p className="text-slate-500 text-xs sm:text-sm md:text-base font-medium max-w-xl mx-auto leading-relaxed">
+                        A safe, nurturing, and gender-responsive space dedicated to child-care, maternal support, and family development at DOST Region 1.
+                    </p>
+                </section>
+
+                {/* 3. SERVICES OFFERED / CODE INPUT INTERACTIVE SECTION */}
+                <section id="services" className="px-4 sm:px-8 pb-12 max-w-6xl mx-auto w-full">
+                    <div className="flex flex-col items-center sm:items-start mb-6">
+                        <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                            Services Offered
+                        </h2>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                            {selectedLandingService 
+                                ? `Time In for ${selectedLandingService}` 
+                                : 'Select any service below to record your Time In for today\'s visit'}
+                        </p>
+                    </div>
+
+                    {/* WHEN NO SERVICE IS SELECTED: Display 3 Cards side-by-side */}
+                    {!selectedLandingService && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {PORTAL_SERVICES.map((service) => (
+                                <div
+                                    key={service.id}
+                                    onClick={() => handleSelectLandingService(service.label)}
+                                    className="group bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 hover:border-[#7030a0] shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between cursor-pointer min-h-[380px] sm:min-h-[420px]"
+                                >
+                                    <div>
+                                        {/* Station Badge + Emoji */}
+                                        <div className="flex items-center justify-between mb-5">
+                                            <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border ${service.badgeBg}`}>
+                                                {service.badge}
+                                            </span>
+                                            <span className="text-4xl group-hover:scale-125 transition-transform duration-300">
+                                                {service.emoji}
+                                            </span>
+                                        </div>
+
+                                        {/* Title */}
+                                        <h3 className="text-xl font-black text-slate-900 group-hover:text-[#7030a0] transition-colors mb-1.5">
+                                            {service.label}
+                                        </h3>
+                                        <p className="text-xs font-bold text-[#7030a0]/90 mb-3">
+                                            {service.tagline}
+                                        </p>
+                                        <p className="text-xs text-slate-500 font-medium leading-relaxed mb-6">
+                                            {service.desc}
+                                        </p>
+
+                                        {/* Features bullet list */}
+                                        <div className="space-y-2 border-t border-slate-100 pt-4 mb-6">
+                                            {service.features.map((feat, idx) => (
+                                                <div key={idx} className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#7030a0]" />
+                                                    <span>{feat}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Action Button */}
+                                    <div className="w-full py-3 bg-violet-50 group-hover:bg-[#7030a0] text-[#7030a0] group-hover:text-white rounded-2xl text-xs font-extrabold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 shadow-sm">
+                                        <span>Time In Here</span>
+                                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* WHEN A SERVICE IS SELECTED: Cards are removed, and Code Input is the ONLY one to appear */}
+                    {selectedLandingService && (
+                        <div className="animate-in fade-in zoom-in-95 duration-400 max-w-xl mx-auto w-full bg-white rounded-3xl p-6 sm:p-9 border border-slate-200/90 shadow-2xl shadow-violet-100">
+                            {/* Step 0: Enter Code ID or Email */}
+                            {checkinStep === 0 && (
+                                <>
+                                    <div className="flex items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
+                                        <button
+                                            type="button"
+                                            onClick={handleBackToServices}
+                                            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#7030a0] py-1.5 px-3 rounded-xl hover:bg-violet-50 transition-colors cursor-pointer"
+                                        >
+                                            <ChevronLeft size={16} />
+                                            <span>Choose another service</span>
+                                        </button>
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-violet-100 text-[#7030a0] rounded-full text-xs font-extrabold tracking-wide">
+                                            {PORTAL_SERVICES.find(s => s.label === selectedLandingService)?.emoji} {selectedLandingService}
+                                        </span>
+                                    </div>
+
+                                    <div className="text-center sm:text-left mb-6">
+                                        <h3 className="text-2xl font-black text-slate-850 tracking-tight mb-1.5">
+                                            Time In Verification
+                                        </h3>
+                                        <p className="text-slate-500 text-xs sm:text-sm font-medium leading-relaxed">
+                                            Enter your 5-digit Visitor Code ID or registered Email Address to record your Time In for <span className="font-extrabold text-[#7030a0]">{selectedLandingService}</span>.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-4 mb-6">
+                                        <div>
+                                            <label className="block text-slate-700 text-xs font-bold mb-2">
+                                                Visitor Code ID or Email Address <span className="text-red-500">*</span>
+                                            </label>
+                                            <div className="relative flex items-center">
+                                                <input
+                                                    type="text"
+                                                    value={checkinInput}
+                                                    onChange={(e) => setCheckinInput(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            handleVerifyVisitor();
+                                                        }
+                                                    }}
+                                                    autoFocus
+                                                    placeholder="e.g. 54321 or name@region1.dost.gov.ph"
+                                                    className="w-full pl-4 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold outline-none focus:border-[#7030a0] focus:ring-4 focus:ring-violet-100 focus:bg-white transition-all text-slate-700"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={showScanner ? stopScanner : () => startScanner('checkin')}
+                                                    className={`absolute right-2.5 p-2 rounded-xl transition-all cursor-pointer ${
+                                                        showScanner
+                                                            ? 'bg-red-50 text-red-500 hover:bg-red-100'
+                                                            : 'bg-violet-50 text-[#7030a0] hover:bg-violet-100'
+                                                    }`}
+                                                    title={showScanner ? 'Close Scanner' : 'Scan Access Pass QR Code'}
+                                                >
+                                                    <Camera size={18} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {showScanner && (
+                                        <div className="mb-6 overflow-hidden rounded-2xl border border-violet-200 relative aspect-video bg-black flex items-center justify-center shadow-inner">
+                                            <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
+                                            {scannerLoading ? (
+                                                <div className="absolute inset-0 bg-black flex flex-col items-center justify-center text-white text-xs font-semibold gap-2 z-10">
+                                                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                    <span>Starting camera...</span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="absolute inset-0 border-[20px] sm:border-[30px] border-black/40 flex items-center justify-center pointer-events-none">
+                                                        <div className="w-32 h-32 sm:w-40 sm:h-40 border-2 border-[#7030a0] rounded-xl relative">
+                                                            <div className="absolute top-0 left-0 right-0 h-0.5 bg-pink-500 animate-scan shadow-[0_0_8px_#ec4899]" />
+                                                            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-pink-500 -mt-0.5 -ml-0.5" />
+                                                            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-pink-500 -mt-0.5 -mr-0.5" />
+                                                            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-pink-500 -mb-0.5 -ml-0.5" />
+                                                            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-pink-500 -mb-0.5 -mr-0.5" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm text-[9px] text-white px-2.5 py-1 rounded-full font-bold tracking-wider uppercase pointer-events-none">
+                                                        Align QR code within box
+                                                    </div>
+                                                </>
+                                            )}
+                                            <canvas ref={canvasRef} className="hidden" />
+                                        </div>
+                                    )}
+
+                                    <button
+                                        type="button"
+                                        onClick={() => handleVerifyVisitor()}
+                                        disabled={isVerifying || !checkinInput.trim()}
+                                        className="w-full py-4 bg-gradient-to-r from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2484] text-white rounded-2xl font-bold hover:shadow-lg active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md shadow-violet-200"
+                                    >
+                                        {isVerifying ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                <span>Verifying...</span>
+                                            </>
+                                        ) : (
+                                            <span>Verify Visitor & Continue</span>
+                                        )}
+                                    </button>
+
+                                    {checkinWarning && (
+                                        <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col items-start gap-2.5 text-left text-amber-900 animate-in fade-in duration-200">
+                                            <div className="flex items-start gap-2.5">
+                                                <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                                                <span className="text-xs font-semibold leading-relaxed">{checkinWarning}</span>
+                                            </div>
+                                            {checkinActiveVisit && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setFlowType('timeout');
+                                                        setShowCoverPage(false);
+                                                        setVerifiedTimeoutVisitor(checkinActiveVisit);
+                                                        setTimeoutStep(1);
+                                                        setCheckinWarning('');
+                                                        setCheckinActiveVisit(null);
+                                                    }}
+                                                    className="mt-1 px-4 py-2 bg-gradient-to-r from-violet-600 to-[#7030a0] text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+                                                >
+                                                    <LogOut size={14} />
+                                                    Record Time Out Now
+                                                </button>
+                                            )}
+                                            {checkinWarning.includes('Please register first') && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        handleInputChange('serviceAvailed', selectedLandingService || '');
+                                                        setFlowType('register');
+                                                        setCurrentPart(0);
+                                                        setShowCoverPage(false);
+                                                        setCheckinWarning('');
+                                                        window.history.pushState({}, '', '/registration');
+                                                    }}
+                                                    className="mt-1 px-4 py-2 bg-[#7030a0] hover:bg-[#5b2783] text-white text-xs font-bold rounded-xl transition-all shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
+                                                >
+                                                    Register First Entry Here →
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    <div className="mt-6 pt-5 border-t border-slate-100 text-center">
+                                        <p className="text-xs text-slate-500 font-medium">
+                                            First time visiting?{' '}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    handleInputChange('serviceAvailed', selectedLandingService || '');
+                                                    setFlowType('register');
+                                                    setShowCoverPage(false);
+                                                    window.history.pushState({}, '', '/registration');
+                                                }}
+                                                className="font-bold text-[#7030a0] hover:underline cursor-pointer"
+                                            >
+                                                Register here to get your Access Pass
+                                            </button>
+                                        </p>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Step 1: Confirm Details & Select Accompanying Children */}
+                            {checkinStep === 1 && verifiedVisitor && (
+                                <>
+                                    <div className="flex items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
+                                        <button
+                                            type="button"
+                                            onClick={() => setCheckinStep(0)}
+                                            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#7030a0] py-1.5 px-3 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
+                                        >
+                                            <ChevronLeft size={16} />
+                                            <span>Back</span>
+                                        </button>
+                                        <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full uppercase tracking-wider">
+                                            ✓ Visitor Verified
+                                        </span>
+                                    </div>
+
+                                    <h3 className="text-xl font-extrabold text-slate-800 mb-1">Confirm Your Time In</h3>
+                                    <p className="text-slate-500 text-xs font-semibold mb-5">
+                                        Station: <span className="text-[#7030a0] font-black">{selectedLandingService || formData.serviceAvailed}</span>
+                                    </p>
+
+                                    {/* Visitor Profile Details */}
+                                    <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mb-5 text-left">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Visitor Profile</span>
+                                        <div className="space-y-1.5 text-xs text-slate-700 font-semibold">
+                                            <p><span className="text-slate-400 font-bold">Name:</span> {verifiedVisitor.parent_name}</p>
+                                            {verifiedVisitor.email && <p><span className="text-slate-400 font-bold">Email:</span> {verifiedVisitor.email}</p>}
+                                            <p><span className="text-slate-400 font-bold">Contact:</span> {verifiedVisitor.contact_number}</p>
+                                            <p><span className="text-slate-400 font-bold">Agency/Address:</span> {verifiedVisitor.office_unit_address}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Accompanying Children Selection */}
+                                    <div className="mb-6 text-left">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2.5">
+                                            Accompanying Children (Select all that apply)
+                                        </span>
+                                        {Array.isArray(verifiedVisitor.children) && verifiedVisitor.children.length > 0 ? (
+                                            <div className="flex flex-col gap-2.5">
+                                                {verifiedVisitor.children.map((child, idx) => {
+                                                    const isSelected = selectedChildren.some(c => c.name === child.name);
+                                                    return (
+                                                        <button
+                                                            key={idx}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (isSelected) {
+                                                                    setSelectedChildren(selectedChildren.filter(c => c.name !== child.name));
+                                                                } else {
+                                                                    setSelectedChildren([...selectedChildren, child]);
+                                                                }
+                                                            }}
+                                                            className={`flex items-center justify-between p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                                                                isSelected ? 'border-[#7030a0] bg-violet-50/60 shadow-sm' : 'border-slate-200 hover:border-violet-200 bg-slate-50/50'
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-center gap-2.5">
+                                                                <Baby className={`w-4 h-4 ${isSelected ? 'text-[#7030a0]' : 'text-slate-400'}`} />
+                                                                <span className={`text-xs font-bold ${isSelected ? 'text-slate-800' : 'text-slate-600'}`}>{child.name}</span>
+                                                                <span className="text-[11px] text-slate-400 font-medium">({child.age} yrs, {child.sex})</span>
+                                                            </div>
+                                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                                                                isSelected ? 'border-[#7030a0] bg-[#7030a0] text-white' : 'border-slate-300'
+                                                            }`}>
+                                                                {isSelected && <Check size={12} className="stroke-[3]" />}
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <div className="text-slate-400 text-xs italic py-2">
+                                                No children registered under this profile. Proceeding with personal check-in.
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleSubmitCheckin}
+                                        disabled={isSubmittingCheckin}
+                                        className="w-full py-4 bg-gradient-to-r from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2484] text-white rounded-2xl font-bold hover:shadow-lg active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm shadow-md shadow-violet-200 cursor-pointer"
+                                    >
+                                        {isSubmittingCheckin ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                <span>Recording Time In...</span>
+                                            </>
+                                        ) : (
+                                            <span>Complete Check-in</span>
+                                        )}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    )}
+
+                    {/* 4. BOTTOM HELPER PROMPT matching mockup */}
+                    <div className="mt-10 sm:mt-12 text-center space-y-3">
+                        <p className="text-xs sm:text-sm text-slate-600 font-medium">
+                            Click{' '}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    handleInputChange('serviceAvailed', '');
+                                    setFlowType('register');
+                                    setShowCoverPage(false);
+                                    window.history.pushState({}, '', '/registration');
+                                }}
+                                className="font-extrabold text-[#7030a0] hover:underline cursor-pointer"
+                            >
+                                here
+                            </button>{' '}
+                            or the register button at the top if this is your first time
+                        </p>
+
+                        <a 
+                            href="#about"
+                            className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-slate-400 hover:text-[#7030a0] transition-colors py-1 cursor-pointer"
+                        >
+                            <span>Don't know the system? Know more by scrolling</span>
+                            <ChevronDown size={14} className="animate-bounce" />
+                        </a>
+                    </div>
+                </section>
+
+                {/* 5. QUICK DEPARTURE & FEEDBACK SECTION */}
+                <section className="bg-slate-50 py-12 px-4 sm:px-8 border-y border-slate-200/70">
+                    <div className="max-w-4xl mx-auto text-center mb-8">
+                        <span className="text-[11px] font-black text-[#7030a0] uppercase tracking-wider block mb-1">
+                            Visitor Actions
+                        </span>
+                        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                            Departing or Leaving Feedback?
+                        </h2>
+                        <p className="text-slate-500 text-xs sm:text-sm font-medium mt-1">
+                            Use these quick actions before leaving the Innovation Hub
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setFlowType('timeout');
+                                setShowCoverPage(false);
+                                setTimeoutStep(0);
+                                setTimeoutInput('');
+                                setVerifiedTimeoutVisitor(null);
+                                setTimeoutWarning('');
+                            }}
+                            className="group p-5 bg-white rounded-2xl border border-slate-200 hover:border-violet-300 shadow-sm hover:shadow-md transition-all text-left flex items-start gap-4 cursor-pointer hover:-translate-y-0.5"
+                        >
+                            <div className="p-3 bg-violet-50 text-[#7030a0] rounded-xl group-hover:bg-[#7030a0] group-hover:text-white transition-colors shrink-0">
+                                <LogOut size={22} />
+                            </div>
+                            <div>
+                                <h4 className="font-extrabold text-slate-800 text-sm group-hover:text-[#7030a0] transition-colors">
+                                    Record Departure (Time Out)
+                                </h4>
+                                <p className="text-slate-500 text-xs font-medium mt-1 leading-relaxed">
+                                    Scan QR code or enter code ID to complete your visit duration.
+                                </p>
+                            </div>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setFlowType('evaluate');
+                                setShowCoverPage(false);
+                                setEvalStep(0);
+                                setEvalVerifyInput('');
+                                setVerifiedEvalVisitor(null);
+                                setEvalVisits([]);
+                                setEvalWarning('');
+                                setCodeValidated(false);
+                            }}
+                            className="group p-5 bg-white rounded-2xl border border-slate-200 hover:border-violet-300 shadow-sm hover:shadow-md transition-all text-left flex items-start gap-4 cursor-pointer hover:-translate-y-0.5"
+                        >
+                            <div className="p-3 bg-violet-50 text-[#7030a0] rounded-xl group-hover:bg-[#7030a0] group-hover:text-white transition-colors shrink-0">
+                                <Sparkles size={22} />
+                            </div>
+                            <div>
+                                <h4 className="font-extrabold text-slate-800 text-sm group-hover:text-[#7030a0] transition-colors">
+                                    Service Evaluation Survey
+                                </h4>
+                                <p className="text-slate-500 text-xs font-medium mt-1 leading-relaxed">
+                                    Evaluate our staff, facilities, and child-care amenities in 1 minute.
+                                </p>
+                            </div>
+                        </button>
+                    </div>
+                </section>
+
+                {/* 6. ABOUT SECTION */}
+                <section id="about" className="py-16 px-4 sm:px-8 max-w-5xl mx-auto">
+                    <div className="text-center max-w-2xl mx-auto mb-12">
+                        <span className="text-[11px] font-black text-[#7030a0] uppercase tracking-wider block mb-1">
+                            About The Hub
+                        </span>
+                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                            Promoting Equality & Safe Spaces
+                        </h2>
+                        <p className="text-slate-500 text-xs sm:text-sm font-medium mt-2 leading-relaxed">
+                            The DOST Region 1 Innovation Hub for Gender and Development (iHub GAD) was established to champion family welfare, employee work-life integration, and women empowerment.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 flex flex-col">
+                            <div className="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-lg mb-4">
+                                <Heart size={20} />
+                            </div>
+                            <h3 className="font-extrabold text-slate-800 text-base mb-2">Child-Friendly Atmosphere</h3>
+                            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                                Designed specifically for infants and toddlers with supervised toys, sanitizing protocols, and fun learning materials.
+                            </p>
+                        </div>
+
+                        <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 flex flex-col">
+                            <div className="w-10 h-10 rounded-2xl bg-violet-100 text-[#7030a0] flex items-center justify-center font-bold text-lg mb-4">
+                                <ShieldCheck size={20} />
+                            </div>
+                            <h3 className="font-extrabold text-slate-800 text-base mb-2">Maternal Privacy & Health</h3>
+                            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                                Fully equipped lactation station complying with national health policies, ensuring comfort and dignity for nursing mothers.
+                            </p>
+                        </div>
+
+                        <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 flex flex-col">
+                            <div className="w-10 h-10 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg mb-4">
+                                <BookOpen size={20} />
+                            </div>
+                            <h3 className="font-extrabold text-slate-800 text-base mb-2">Gender Literacy</h3>
+                            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                                Comprehensive GAD repository featuring research, national guidelines, policy tools, and equality publications.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 7. CONTACT US & COMPLIANCE FOOTER */}
+                <footer id="contact" className="bg-slate-900 text-white pt-12 pb-8 px-4 sm:px-8 mt-auto">
+                    <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 pb-10 border-b border-slate-800">
+                        <div>
+                            <div className="flex items-center gap-2.5 mb-3">
+                                <div className="bg-white/10 p-1.5 rounded-lg">
+                                    <img src={ihubLogo} alt="iHub GAD" className="h-6 w-6 rounded-full object-cover" />
+                                </div>
+                                <span className="font-black text-base tracking-tight text-white">
+                                    DOST Region 1 <span className="text-violet-400">iHubGAD</span>
+                                </span>
+                            </div>
+                            <p className="text-xs text-slate-400 leading-relaxed font-normal">
+                                Department of Science and Technology - Regional Office No. 1<br />
+                                Innovation Hub for Gender and Development (iHub GAD)
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-300 mb-3">
+                                Location & Contact
+                            </h4>
+                            <p className="text-xs text-slate-400 leading-relaxed font-normal space-y-1">
+                                <span>📍 DMMMSU-MLUC Campus, City of San Fernando, La Union</span><br />
+                                <span>📧 oord@region1.dost.gov.ph</span><br />
+                                <span>☎️ (072) 888-3399 / 700-2372</span>
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-300 mb-3">
+                                Data Privacy Compliance
+                            </h4>
+                            <p className="text-xs text-slate-400 leading-relaxed italic">
+                                "All visitor records are handled with strict confidentiality in full compliance with the Data Privacy Act of 2012 (Republic Act No. 10173)."
+                            </p>
+                            <div className="mt-3">
+                                <a 
+                                    href="/login" 
+                                    className="text-[11px] font-bold text-violet-300 hover:text-white inline-flex items-center gap-1 transition-colors"
+                                >
+                                    <span>Administrator Login →</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="max-w-6xl mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 font-medium">
+                        <p>© {new Date().getFullYear()} DOST Ilocos Region • Developed by ITSM Unit</p>
+                        <p className="font-mono mt-1 sm:mt-0">v1.1.0 • GAD Innovation Portal</p>
+                    </div>
+                </footer>
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen bg-white flex flex-col font-sans">
+        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+            {/* Top Navigation Bar for Form Pages */}
+            <header className="sticky top-0 z-50 bg-[#7030a0] shadow-md px-4 sm:px-8 py-3 flex items-center justify-between text-white">
+                <button
+                    type="button"
+                    onClick={() => {
+                        setShowBackConfirm(true);
+                    }}
+                    className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white hover:text-violet-200 transition-colors bg-white/10 hover:bg-white/20 px-3.5 py-1.5 rounded-full cursor-pointer"
+                >
+                    <ChevronLeft size={16} />
+                    <span>Back to Portal</span>
+                </button>
+                <div className="flex items-center gap-2.5">
+                    <img src={dostLogo} alt="DOST Logo" className="h-8 w-auto object-contain drop-shadow-sm" />
+                    <span className="text-xs sm:text-sm font-black tracking-tight text-white hidden xs:inline">
+                        iHub<span className="text-violet-200">GAD</span>
+                    </span>
+                </div>
+            </header>
             <main className="flex-1 flex justify-center bg-white w-full">
                 <div className="w-full bg-white flex flex-col lg:flex-row relative min-h-screen transition-all duration-300">
 
@@ -674,126 +1411,6 @@ export default function FeedbackForm() {
 
                         {/* Scrollable Form Body */}
                         <div className="flex-1 overflow-y-auto px-4 py-4 lg:px-6 lg:py-6 pb-24 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-
-                        {showCoverPage && (
-                            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 max-w-2xl mx-auto w-full flex flex-col pt-12 lg:pt-20 pb-8">
-                                
-                                {/* Logos and Welcome Badge inside Landing Page */}
-                                <div className="flex flex-col items-start mb-6">
-                                    <div className="flex justify-start items-center gap-6 mb-3 animate-in fade-in duration-700">
-                                        <img src="/DOST_seal.png" alt="DOST Seal" className="h-14 w-auto drop-shadow-sm" />
-                                        <img src="/Bagong_Pilipinas_Logo.svg" alt="Bagong Pilipinas" className="h-14 w-auto drop-shadow-sm" />
-                                    </div>
-                                    <div className="text-left animate-in fade-in duration-700">
-                                        <div className="inline-block px-4 py-1.5 bg-violet-100 text-[#7030a0] rounded-full text-[10px] font-bold tracking-widest border border-violet-200/50 shadow-sm animate-pulse-soft">
-                                            <PartyPopper size={12} className="inline mr-2 -mt-0.5" />
-                                            WELCOME TO DOST ILOCOS REGION INNOVATION HUB
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Welcome Title inside Right Pane Landing Page */}
-                                <div className="text-left mb-10 animate-in fade-in duration-700">
-                                    <h1 className="text-4xl font-extrabold text-slate-850 tracking-tight mb-3">Innovation Hub for GAD</h1>
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-pink-50 text-[#7030a0] rounded-full text-xs font-bold shadow-sm">
-                                        <Heart size={14} className="fill-current text-pink-500 shrink-0 animate-pulse-soft" />
-                                        <span>A Safe & Joyful Space for Women and Children</span>
-                                        <Heart size={14} className="fill-current text-pink-500 shrink-0 animate-pulse-soft" />
-                                    </div>
-                                </div>
-
-                                {/* Action Buttons */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                                    <button
-                                        onClick={() => {
-                                            handleInputChange('serviceAvailed', '');
-                                            setFlowType('register');
-                                            setShowCoverPage(false);
-                                            window.history.pushState({}, '', '/registration');
-                                        }}
-                                        className="group bg-gradient-to-br from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2783] text-white p-5 rounded-3xl font-bold transition-all shadow-lg hover:shadow-violet-200 hover:shadow-xl active:scale-[0.98] text-left flex flex-col justify-between min-h-[145px] border border-transparent"
-                                    >
-                                        <div className="bg-white/10 p-2.5 rounded-2xl w-fit">
-                                            <Baby size={24} className="group-hover:scale-110 transition-transform duration-300 text-pink-200" />
-                                        </div>
-                                        <div className="flex flex-col mt-3">
-                                            <span className="text-base tracking-wide font-extrabold leading-tight">Register</span>
-                                            <span className="text-[8.5px] font-black text-violet-200 uppercase tracking-wider mt-0.5">First Entry</span>
-                                            <span className="text-[11px] font-normal text-violet-200/90 mt-2">Register details for your first visit to get your unique code</span>
-                                        </div>
-                                    </button>
-
-                                    <button
-                                        onClick={() => setShowServicesModal(true)}
-                                        className="group bg-white border border-slate-100 hover:border-violet-200 hover:bg-violet-50/5 text-slate-700 p-5 rounded-3xl font-bold transition-all active:scale-[0.98] text-left flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:scale-[1.01]"
-                                    >
-                                        <div className="bg-violet-50 p-2.5 rounded-2xl w-fit group-hover:bg-violet-100 transition-colors">
-                                            <Building2 size={24} className="group-hover:scale-110 transition-transform duration-300 text-[#7030a0]" />
-                                        </div>
-                                        <div className="flex flex-col mt-3">
-                                            <span className="text-base tracking-wide font-extrabold leading-tight group-hover:text-[#7030a0] transition-colors">Services & Check-in</span>
-                                            <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wider mt-0.5">Hub Stations</span>
-                                            <span className="text-[11px] font-normal text-slate-500 mt-2">Select a GAD station and check in for today's visit</span>
-                                        </div>
-                                    </button>
-
-                                    <button
-                                        onClick={() => {
-                                            setFlowType('timeout');
-                                            setShowCoverPage(false);
-                                            setTimeoutStep(0);
-                                            setTimeoutInput('');
-                                            setVerifiedTimeoutVisitor(null);
-                                            setTimeoutWarning('');
-                                        }}
-                                        className="group bg-white border border-slate-100 hover:border-violet-200 hover:bg-violet-50/5 text-slate-700 p-5 rounded-3xl font-bold transition-all active:scale-[0.98] text-left flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:scale-[1.01]"
-                                    >
-                                        <div className="bg-violet-50 p-2.5 rounded-2xl w-fit group-hover:bg-violet-100 transition-colors">
-                                            <LogOut size={24} className="group-hover:scale-110 transition-transform duration-300 text-[#7030a0]" />
-                                        </div>
-                                        <div className="flex flex-col mt-3">
-                                            <span className="text-base tracking-wide font-extrabold leading-tight group-hover:text-[#7030a0] transition-colors">Time Out</span>
-                                            <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wider mt-0.5">Record Departure</span>
-                                            <span className="text-[11px] font-normal text-slate-500 mt-2">Scan QR code or enter code ID to complete your visit</span>
-                                        </div>
-                                    </button>
-                                    
-                                    <button
-                                        onClick={() => {
-                                            setFlowType('evaluate');
-                                            setShowCoverPage(false);
-                                            setEvalStep(0);
-                                            setEvalVerifyInput('');
-                                            setVerifiedEvalVisitor(null);
-                                            setEvalVisits([]);
-                                            setEvalWarning('');
-                                            setCodeValidated(false);
-                                        }}
-                                        className="group bg-white border border-slate-100 hover:border-violet-200 hover:bg-violet-50/5 text-slate-700 p-5 rounded-3xl font-bold transition-all active:scale-[0.98] text-left flex flex-col justify-between min-h-[145px] shadow-sm hover:shadow-md hover:scale-[1.01]"
-                                    >
-                                        <div className="bg-violet-50 p-2.5 rounded-2xl w-fit group-hover:bg-violet-100 transition-colors">
-                                            <Sparkles size={24} className="group-hover:scale-110 transition-transform duration-300 text-violet-600" />
-                                        </div>
-                                        <div className="flex flex-col mt-3">
-                                            <span className="text-base tracking-wide font-extrabold leading-tight group-hover:text-[#7030a0] transition-colors">Service Evaluation</span>
-                                            <span className="text-[8.5px] font-black text-slate-400 uppercase tracking-wider mt-0.5">Feedback</span>
-                                            <span className="text-[11px] font-normal text-slate-500 mt-2">Enter your visitor code to evaluate our services and staff</span>
-                                        </div>
-                                    </button>
-                                </div>
-
-                                {/* Privacy Policy */}
-                                <div className="bg-amber-50/40 rounded-3xl p-5 border border-amber-100/60 shadow-sm max-w-md w-full text-left">
-                                    <span className="font-bold text-amber-800 text-[10px] uppercase tracking-wider block mb-1.5 opacity-80">Privacy Protection & DPA Compliance</span>
-                                    <p className="text-[11px] text-amber-900/70 leading-relaxed italic">
-                                        "All information is secure with us, handled privately in strict compliance with the Data Privacy Act of 2012."
-                                    </p>
-                                </div>
-                                <div className="mt-3 text-center text-[10px] text-slate-300 font-mono tracking-wider">
-                                    DOST Innovation Hub for GAD • v1.1.0
-                                </div>
-                            </div>
-                        )}
 
                         {showThankYou && (
                             <div className="text-center animate-in zoom-in-95 duration-500 py-8 max-w-md mx-auto my-6 bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-100/30">
