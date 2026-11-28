@@ -89,9 +89,9 @@ export default function EvaluationFormView({
 
                         {/* Progress Bar & Parts Stepper */}
                         <div className="w-full max-w-2xl mb-8">
-                            <div className="flex items-center justify-between text-xs font-bold text-slate-500 mb-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-bold text-slate-500 mb-2">
                                 <span>Step {currentPart} of {totalParts}</span>
-                                <span className="text-[#7030a0] font-extrabold">
+                                <span className="text-[#7030a0] font-extrabold sm:text-right">
                                     {currentPart === totalParts ? 'Comments & Suggestions' : formParts[currentPart - 1]?.label || 'Evaluation'}
                                 </span>
                             </div>
@@ -112,20 +112,20 @@ export default function EvaluationFormView({
 
                         {/* Active Visit Info Card */}
                         {formData.serviceAvailed && (
-                            <div className="w-full max-w-2xl bg-white border border-slate-200/80 rounded-2xl px-5 py-3.5 mb-6 flex items-center justify-between shadow-sm">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-xl bg-violet-50 text-[#7030a0] flex items-center justify-center text-lg">
+                            <div className="w-full max-w-2xl bg-white border border-slate-200/80 rounded-2xl p-4 sm:px-5 sm:py-3.5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 shadow-sm">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-10 h-10 rounded-xl bg-violet-50 text-[#7030a0] flex items-center justify-center text-lg shrink-0 border border-violet-100/80">
                                         {formData.serviceAvailed.includes('Child') ? '👶' : formData.serviceAvailed.includes('Mother') ? '🤱' : '📚'}
                                     </div>
-                                    <div className="text-left">
+                                    <div className="text-left min-w-0">
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Evaluating Service</span>
-                                        <span className="text-xs font-black text-slate-800">{formData.serviceAvailed}</span>
+                                        <span className="text-xs sm:text-sm font-black text-slate-800 block">{formData.serviceAvailed}</span>
                                     </div>
                                 </div>
                                 {verifiedEvalVisitor && (
-                                    <div className="text-right">
+                                    <div className="flex items-center justify-between sm:flex-col sm:items-end border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100 shrink-0">
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Visitor</span>
-                                        <span className="text-xs font-extrabold text-[#7030a0]">{verifiedEvalVisitor.parent_name}</span>
+                                        <span className="text-xs sm:text-sm font-extrabold text-[#7030a0] block">{verifiedEvalVisitor.parent_name}</span>
                                     </div>
                                 )}
                             </div>
@@ -245,7 +245,7 @@ export default function EvaluationFormView({
                                         <button
                                             type="button"
                                             onClick={goNext}
-                                            className="px-7 py-3.5 bg-gradient-to-r from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2484] text-white rounded-xl font-bold text-xs shadow-md shadow-violet-200 hover:shadow-lg transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+                                            className="px-7 py-3.5 bg-[#7030a0] hover:bg-[#5b2783]   text-white rounded-xl font-bold text-xs shadow-md shadow-violet-200 hover:shadow-lg transition-all active:scale-95 cursor-pointer flex items-center gap-2"
                                         >
                                             <span>Continue to Next Step →</span>
                                         </button>
@@ -289,7 +289,7 @@ export default function EvaluationFormView({
                                         type="button"
                                         onClick={submitEvaluation}
                                         disabled={submitting}
-                                        className="px-8 py-3.5 bg-gradient-to-r from-violet-600 to-[#7030a0] hover:from-violet-700 hover:to-[#5b2484] text-white rounded-xl font-bold text-sm shadow-md shadow-violet-200 hover:shadow-lg transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+                                        className="px-8 py-3.5 bg-[#7030a0] hover:bg-[#5b2783]   text-white rounded-xl font-bold text-sm shadow-md shadow-violet-200 hover:shadow-lg transition-all active:scale-95 cursor-pointer flex items-center gap-2"
                                     >
                                         {submitting ? (
                                             <>

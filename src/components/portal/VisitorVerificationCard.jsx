@@ -40,7 +40,7 @@ export default function VisitorVerificationCard({
         <div className="w-full flex flex-col items-center">
             {/* MODE A: VERIFY VISITOR (CODE ID / QR ONLY - NO EMAIL) */}
             {portalFlowState === 'verify' && (
-                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-2xl shadow-purple-950/20 max-w-md sm:max-w-lg mx-auto w-full">
+                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-[45px] p-5 sm:p-7 border border-slate-200/90 shadow-2xl shadow-purple-950/20 max-w-md sm:max-w-lg mx-auto w-full">
                     <div className="text-center mb-4 sm:mb-5">
                         <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-1">
                             Time In & Departure
@@ -158,7 +158,7 @@ export default function VisitorVerificationCard({
 
             {/* MODE B: VISITOR VERIFIED -> SELECT SERVICE TO TIME IN (NO ACTIVE VISIT TODAY) */}
             {portalFlowState === 'select_service' && activeVisitorProfile && (
-                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-2xl shadow-purple-950/20 max-w-xl mx-auto w-full">
+                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-[45px] p-5 sm:p-7 border border-slate-200/90 shadow-2xl shadow-purple-950/20 max-w-xl mx-auto w-full">
                     <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100">
                         <button
                             type="button"
@@ -279,7 +279,7 @@ export default function VisitorVerificationCard({
 
             {/* MODE C: ACTIVE VISIT FOUND -> "TIME OUT TO THIS SERVICE? -> EVALUATION FORM" */}
             {portalFlowState === 'confirm_timeout' && activeVisitRecord && activeVisitorProfile && (
-                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-3xl p-5 sm:p-7 border border-violet-200 shadow-2xl shadow-purple-950/20 max-w-lg mx-auto w-full text-left">
+                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-[45px] p-5 sm:p-7 border border-violet-200 shadow-2xl shadow-purple-950/20 max-w-lg mx-auto w-full text-left">
                     <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100">
                         <button
                             type="button"
@@ -356,7 +356,7 @@ export default function VisitorVerificationCard({
 
             {/* MODE D: CHECK-IN SUCCESS CONFIRMATION */}
             {portalFlowState === 'checkin_success' && timeInSuccessData && (
-                <div className="animate-in zoom-in-95 duration-400 bg-white rounded-3xl p-5 sm:p-7 border border-emerald-200 shadow-2xl shadow-purple-950/20 max-w-lg mx-auto w-full text-center">
+                <div className="animate-in zoom-in-95 duration-400 bg-white rounded-[45px] p-5 sm:p-7 border border-emerald-200 shadow-2xl shadow-purple-950/20 max-w-lg mx-auto w-full text-center">
                     <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 border border-emerald-200 shadow-inner">
                         <CheckCircle2 size={32} />
                     </div>
