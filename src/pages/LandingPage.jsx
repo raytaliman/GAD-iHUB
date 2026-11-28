@@ -86,6 +86,13 @@ export default function LandingPage() {
     const streamRef = useRef(null);
     const codeInputRef = useRef(null);
 
+    // Staged entrance animation matching Login.jsx
+    const [heroRevealed, setHeroRevealed] = useState(false);
+    useEffect(() => {
+        const timer = setTimeout(() => setHeroRevealed(true), 650);
+        return () => clearTimeout(timer);
+    }, []);
+
     // Clear verification warning when user types
     useEffect(() => {
         setVerificationWarning('');
@@ -582,42 +589,54 @@ export default function LandingPage() {
                 {/* Centered Content: Hero + Verification Card + Prompt without large empty gap */}
                 <div className="relative z-10 w-full max-w-xl flex flex-col items-center">
                     {/* 2. HERO HEADER SECTION */}
-                    <PortalHero />
+                    <PortalHero revealed={heroRevealed} />
 
-                    {/* 3. CORE INTERACTIVE WORKSPACE (VERIFY -> SELECT SERVICE -> TIME OUT -> EVALUATION) */}
-                    <VisitorVerificationCard
-                        portalFlowState={portalFlowState}
-                        portalCodeInput={portalCodeInput}
-                        setPortalCodeInput={setPortalCodeInput}
-                        codeInputRef={codeInputRef}
-                        isVerifyingCode={isVerifyingCode}
-                        verificationWarning={verificationWarning}
-                        showScanner={showScanner}
-                        startScanner={startScanner}
-                        stopScanner={stopScanner}
-                        scannerLoading={scannerLoading}
-                        videoRef={videoRef}
-                        canvasRef={canvasRef}
-                        onVerifyCode={handleVerifyPortalVisitor}
-                        onRegisterClick={handleGoToRegister}
-                        onResetPortal={handleResetPortal}
-                        activeVisitorProfile={activeVisitorProfile}
-                        selectedServiceForTimeIn={selectedServiceForTimeIn}
-                        setSelectedServiceForTimeIn={setSelectedServiceForTimeIn}
-                        selectedChildren={selectedChildren}
-                        setSelectedChildren={setSelectedChildren}
-                        isRecordingTimeIn={isRecordingTimeIn}
-                        onConfirmTimeIn={handleConfirmTimeIn}
-                        activeVisitRecord={activeVisitRecord}
-                        isRecordingTimeOut={isRecordingTimeOut}
-                        onConfirmTimeoutAndProceedToEval={handleConfirmTimeoutAndProceedToEval}
-                        formatDuration={formatDuration}
-                        timeInSuccessData={timeInSuccessData}
-                    />
+                    {/* 3. CORE INTERACTIVE WORKSPACE (Staggered reveal after logos settle) */}
+                    <div
+                        className={`w-full flex flex-col items-center transition-all duration-500 ease-out ${
+                            heroRevealed
+                                ? 'delay-500 opacity-100 translate-y-0 pointer-events-auto'
+                                : 'opacity-0 translate-y-4 pointer-events-none'
+                        }`}
+                    >
+                        <VisitorVerificationCard
+                            portalFlowState={portalFlowState}
+                            portalCodeInput={portalCodeInput}
+                            setPortalCodeInput={setPortalCodeInput}
+                            codeInputRef={codeInputRef}
+                            isVerifyingCode={isVerifyingCode}
+                            verificationWarning={verificationWarning}
+                            showScanner={showScanner}
+                            startScanner={startScanner}
+                            stopScanner={stopScanner}
+                            scannerLoading={scannerLoading}
+                            videoRef={videoRef}
+                            canvasRef={canvasRef}
+                            onVerifyCode={handleVerifyPortalVisitor}
+                            onRegisterClick={handleGoToRegister}
+                            onResetPortal={handleResetPortal}
+                            activeVisitorProfile={activeVisitorProfile}
+                            selectedServiceForTimeIn={selectedServiceForTimeIn}
+                            setSelectedServiceForTimeIn={setSelectedServiceForTimeIn}
+                            selectedChildren={selectedChildren}
+                            setSelectedChildren={setSelectedChildren}
+                            isRecordingTimeIn={isRecordingTimeIn}
+                            onConfirmTimeIn={handleConfirmTimeIn}
+                            activeVisitRecord={activeVisitRecord}
+                            isRecordingTimeOut={isRecordingTimeOut}
+                            onConfirmTimeoutAndProceedToEval={handleConfirmTimeoutAndProceedToEval}
+                            formatDuration={formatDuration}
+                            timeInSuccessData={timeInSuccessData}
+                        />
+                    </div>
                 </div>
 
                 {/* Bottom of Section: Know More About Our Services */}
-                <div className="absolute bottom-3 sm:bottom-5 left-0 right-0 z-20 flex justify-center pointer-events-auto select-none">
+                <div
+                    className={`absolute bottom-3 sm:bottom-5 left-0 right-0 z-20 flex justify-center pointer-events-auto select-none transition-all duration-500 ease-out ${
+                        heroRevealed ? 'delay-700 opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+                    }`}
+                >
                     <a
                         href="#services"
                         className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-violet-200/90 hover:text-white transition-all py-1.5 px-4 rounded-full hover:bg-white/10 cursor-pointer group"
