@@ -41,6 +41,26 @@ export function useAuth() {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
+    // Sync with backend session cookie if available
+    useEffect(() => {
+        async function verifyBackendSession() {
+            try {
+                const res = await fetch('/api/auth/verify', { credentials: 'include' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data?.authenticated && data?.user) {
+                        const existing = localStorage.getItem(AUTH_KEY);
+                        if (!existing) {
+                            localStorage.setItem(AUTH_KEY, JSON.stringify({ ...data.user, loggedIn: true }));
+                            setIsAuthenticated(true);
+                        }
+                    }
+                }
+            } catch (_) { }
+        }
+        verifyBackendSession();
+    }, []);
+
     /**
      * Persists user data to local storage and updates local state.
      * @param {Object} userData - Data to associate with the session.
@@ -53,7 +73,10 @@ export function useAuth() {
     /**
      * Removes session data and redirects to the landing page.
      */
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        } catch (_) { }
         localStorage.removeItem(AUTH_KEY);
         setIsAuthenticated(false);
         window.location.href = '/';

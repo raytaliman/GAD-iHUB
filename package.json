@@ -10,8 +10,9 @@
     "preview": "vite preview",
     "server": "node run-api.js",
     "email": "node server.js",
-    "backend": "concurrently -n \"api,email\" -c \"blue,yellow\" \"npm run server\" \"npm run email\"",
-    "dev:all": "concurrently -n \"frontend,backend\" -c \"green,blue\" \"npm run dev\" \"npm run server\""
+    "auth": "node server.js",
+    "backend": "concurrently -n \"postgrest,express\" -c \"blue,yellow\" \"npm run server\" \"node server.js\"",
+    "dev:all": "concurrently -n \"frontend,postgrest,express\" -c \"green,blue,yellow\" \"npm run dev\" \"npm run server\" \"node server.js\""
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

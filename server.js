@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import authRouter from './routes/auth.js';
 
 dotenv.config();
 
@@ -13,8 +14,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(cors());
+
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:3003,http://localhost:5001')
+  .split(',')
+  .map(o => o.trim());
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Permissive in dev
+    }
+  },
+  credentials: true,
+}));
+
 app.use(express.json({ limit: '10mb' }));
+
+// Mount Authentication Router for Microsoft 365 OAuth & Session Management
+app.use('/api/auth', authRouter);
 
 const port = process.env.PORT || 3003;
 

@@ -23,6 +23,42 @@ export default function Login({ onLogin }) {
     return () => clearTimeout(timer);
   }, []);
 
+  // Handle Microsoft OAuth callback response parameters
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const authError = params.get('error');
+    const authSuccess = params.get('auth_success');
+
+    if (authError) {
+      const decodedErr = decodeURIComponent(authError);
+      setError(decodedErr);
+      toast.error(decodedErr, { position: 'top-center' });
+      window.history.replaceState(null, '', window.location.pathname);
+    } else if (authSuccess === 'true') {
+      const emailParam = params.get('email');
+      const fullNameParam = params.get('fullName');
+      const userIdParam = params.get('userId');
+      const userLevelParam = params.get('userLevel') || 'admin';
+      const tokenParam = params.get('token');
+
+      const userData = {
+        email: emailParam,
+        fullName: fullNameParam || emailParam,
+        userId: userIdParam,
+        userLevel: userLevelParam,
+        token: tokenParam,
+        loggedIn: true,
+      };
+
+      localStorage.setItem('csf-auth', JSON.stringify(userData));
+      toast.success(`Welcome, ${fullNameParam || emailParam}!`, { position: 'top-center' });
+      window.history.replaceState(null, '', '/dashboard');
+      if (onLogin) {
+        onLogin(userData);
+      }
+    }
+  }, [onLogin]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -82,9 +118,9 @@ export default function Login({ onLogin }) {
   };
 
   const handleMicrosoftSignIn = () => {
-    toast.info('Microsoft 365 single sign-on is not configured yet. Please log in using your administrator email and password.', {
-      position: 'top-center',
-    });
+    setLoading(true);
+    setError(null);
+    window.location.href = '/api/auth/microsoft';
   };
 
   return (
@@ -274,7 +310,8 @@ export default function Login({ onLogin }) {
               <button
                 type="button"
                 onClick={handleMicrosoftSignIn}
-                className="w-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold py-2.5 sm:py-3 px-3.5 min-h-[44px] rounded-xl flex items-center justify-center gap-2.5 transition-all active:scale-[0.99] shadow-sm cursor-pointer"
+                disabled={loading}
+                className="w-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold py-2.5 sm:py-3 px-3.5 min-h-[44px] rounded-xl flex items-center justify-center gap-2.5 transition-all active:scale-[0.99] shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 21 21">
                   <rect x="1" y="1" width="9" height="9" fill="#f25022" />

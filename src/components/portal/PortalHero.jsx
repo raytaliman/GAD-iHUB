@@ -24,12 +24,6 @@ export default function PortalHero({ onRegisterClick }) {
 
             {/* 2. TEXT CONTENT & ACTION BUTTONS */}
             <div className="w-full flex flex-col items-center lg:items-start">
-                {/* Eyebrow badge */}
-                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-white/15 text-pink-200 text-xs sm:text-sm font-black uppercase tracking-wider mb-4 sm:mb-5 shadow-xs">
-                    <Sparkles size={14} className="text-pink-300" />
-                    <span>A Safe, Nurturing & Inclusive Space</span>
-                </div>
-
                 {/* Big Bold Headline on Desktop */}
                 <h1 className="text-4xl sm:text-6xl lg:text-6xl xl:text-7xl 2xl:text-[5.25rem] font-black text-white tracking-tight leading-[1.04] mb-4 sm:mb-6 drop-shadow-md">
                     Nurturing Families.{' '}
@@ -40,7 +34,7 @@ export default function PortalHero({ onRegisterClick }) {
 
                 {/* Engaging Subtitle on Desktop */}
                 <p className="text-violet-100/90 text-sm sm:text-base lg:text-lg xl:text-xl font-medium max-w-2xl leading-relaxed mb-8 sm:mb-10 drop-shadow-xs">
-                    DOST Ilocos Region’s dedicated hub for child-care, maternal lactation support, and family development, providing modern welfare and resources for employees and community visitors.
+                    DOST Ilocos Region’s dedicated innovation hub for child-care, maternal lactation support, and family development, providing modern welfare and resources for employees and community visitors.
                 </p>
 
                 {/* Action CTA Buttons */}
