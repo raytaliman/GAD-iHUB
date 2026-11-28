@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Heart, Baby, Shapes, ChevronDown } from 'lucide-react';
+import { Sparkles, Heart, Baby, Shapes, ChevronDown, Sun, BookOpen, Smile, Star } from 'lucide-react';
 import { useFeedbackForm } from '../hooks/useFeedbackForm';
 import { supabase } from '../lib/supabase';
 
@@ -86,10 +86,12 @@ export default function LandingPage() {
     const streamRef = useRef(null);
     const codeInputRef = useRef(null);
 
-    // Staged entrance animation matching Login.jsx
-    const [heroRevealed, setHeroRevealed] = useState(false);
+    // Fade-in animation on mount / reload
+    const [heroMounted, setHeroMounted] = useState(false);
     useEffect(() => {
-        const timer = setTimeout(() => setHeroRevealed(true), 650);
+        const timer = setTimeout(() => {
+            setHeroMounted(true);
+        }, 50);
         return () => clearTimeout(timer);
     }, []);
 
@@ -525,125 +527,160 @@ export default function LandingPage() {
                 }}
             />
 
-            {/* SCREEN 1: HERO & VISITOR VERIFICATION WITH PURPLE BACKGROUND & FLOATING DECORATIONS */}
+            {/* SCREEN 1: HERO & VISITOR VERIFICATION WITH SOLID PURPLE BACKGROUND & FLOATING DECORATIONS */}
             <section id="hero" className="min-h-screen w-full flex flex-col justify-center items-center pt-24 sm:pt-28 pb-8 sm:pb-12 px-4 relative bg-[#7030a0] overflow-hidden select-none">
-                {/* Dynamic Ambient Floating Decorative Elements matching Login.jsx */}
+                {/* Dynamic Ambient Floating Decorative Elements (Lighter & Brighter Constellation) */}
                 {/* Top Left Quadrant */}
-                <div className="absolute top-6 left-8 text-white/15 pointer-events-none animate-float hidden xs:block">
-                    <Sparkles size={42} />
+                <div className="absolute top-6 left-8 text-white/40 pointer-events-none animate-float hidden xs:block">
+                    <Sparkles size={44} />
                 </div>
-                <div className="absolute top-20 left-[14%] text-white/10 pointer-events-none animate-float-delayed">
-                    <Heart size={22} />
+                <div className="absolute top-20 left-[14%] text-pink-100/40 pointer-events-none animate-float-delayed">
+                    <Heart size={26} />
                 </div>
-                <div className="absolute top-10 left-[26%] text-white/10 pointer-events-none animate-bounce-subtle hidden sm:block">
-                    <Baby size={30} />
+                <div className="absolute top-10 left-[26%] text-purple-100/40 pointer-events-none animate-bounce-subtle hidden sm:block">
+                    <Baby size={32} />
+                </div>
+                <div className="absolute top-28 left-[6%] text-white/35 pointer-events-none animate-pulse-soft hidden md:block">
+                    <Star size={22} />
+                </div>
+                <div className="absolute top-16 left-[20%] w-2.5 h-2.5 rounded-full bg-white/40 blur-[0.5px] pointer-events-none animate-float" />
+                <div className="absolute top-36 left-[18%] text-amber-100/35 pointer-events-none animate-float hidden lg:block">
+                    <Sun size={28} />
                 </div>
 
+                {/* Top Center & Mid-Top */}
+                <div className="absolute top-8 left-[45%] text-white/30 pointer-events-none animate-float hidden sm:block">
+                    <Star size={20} />
+                </div>
+                <div className="absolute top-14 left-[52%] w-3 h-3 rounded-full bg-pink-100/40 blur-[0.5px] pointer-events-none animate-pulse-soft hidden md:block" />
+
                 {/* Top Right Quadrant */}
-                <div className="absolute top-8 right-10 text-white/15 pointer-events-none animate-float-delayed hidden xs:block">
-                    <Heart size={46} />
+                <div className="absolute top-8 right-10 text-pink-100/40 pointer-events-none animate-float-delayed hidden xs:block">
+                    <Heart size={48} />
                 </div>
-                <div className="absolute top-22 right-[16%] text-white/10 pointer-events-none animate-float">
-                    <Sparkles size={24} />
+                <div className="absolute top-22 right-[16%] text-white/40 pointer-events-none animate-float">
+                    <Sparkles size={28} />
                 </div>
-                <div className="absolute top-12 right-[28%] text-white/10 pointer-events-none animate-bounce-subtle hidden sm:block">
-                    <Baby size={26} />
+                <div className="absolute top-12 right-[28%] text-purple-100/40 pointer-events-none animate-bounce-subtle hidden sm:block">
+                    <Baby size={28} />
+                </div>
+                <div className="absolute top-32 right-[8%] text-amber-100/35 pointer-events-none animate-float-delayed hidden md:block">
+                    <Star size={24} />
+                </div>
+                <div className="absolute top-16 right-[22%] w-2.5 h-2.5 rounded-full bg-white/40 blur-[0.5px] pointer-events-none animate-float-delayed" />
+                <div className="absolute top-36 right-[20%] text-white/35 pointer-events-none animate-bounce-subtle hidden lg:block">
+                    <Smile size={26} />
                 </div>
 
                 {/* Middle Sides */}
-                <div className="absolute top-[48%] left-4 sm:left-12 text-white/15 pointer-events-none animate-bounce-subtle">
-                    <Baby size={36} />
+                <div className="absolute top-[48%] left-3 sm:left-10 text-white/35 pointer-events-none animate-bounce-subtle">
+                    <Baby size={38} />
                 </div>
-                <div className="absolute top-[46%] right-4 sm:right-12 text-white/15 pointer-events-none animate-float">
-                    <Sparkles size={32} />
+                <div className="absolute top-[44%] left-[2%] text-pink-100/35 pointer-events-none animate-float-delayed hidden lg:block">
+                    <Heart size={20} />
                 </div>
-                <div className="absolute top-[62%] left-[12%] text-white/10 pointer-events-none animate-float-delayed hidden sm:block">
-                    <Shapes size={32} />
+                <div className="absolute top-[46%] right-3 sm:right-10 text-white/40 pointer-events-none animate-float">
+                    <Sparkles size={36} />
                 </div>
-                <div className="absolute top-[64%] right-[14%] text-white/10 pointer-events-none animate-float-delayed hidden sm:block">
-                    <Heart size={26} />
+                <div className="absolute top-[52%] right-[3%] text-purple-100/35 pointer-events-none animate-bounce-subtle hidden lg:block">
+                    <Star size={22} />
                 </div>
+                <div className="absolute top-[62%] left-[10%] text-purple-100/35 pointer-events-none animate-float-delayed hidden sm:block">
+                    <Shapes size={34} />
+                </div>
+                <div className="absolute top-[64%] right-[12%] text-pink-100/40 pointer-events-none animate-float-delayed hidden sm:block">
+                    <Heart size={28} />
+                </div>
+                <div className="absolute top-[58%] left-[22%] w-3 h-3 rounded-full bg-white/35 blur-[0.5px] pointer-events-none animate-pulse-soft hidden lg:block" />
+                <div className="absolute top-[56%] right-[22%] w-2 h-2 rounded-full bg-pink-200/40 blur-[0.5px] pointer-events-none animate-float hidden lg:block" />
 
                 {/* Bottom Left Quadrant */}
-                <div className="absolute bottom-8 left-8 text-white/15 pointer-events-none animate-bounce-subtle hidden xs:block">
-                    <Heart size={36} />
+                <div className="absolute bottom-8 left-8 text-pink-100/40 pointer-events-none animate-bounce-subtle hidden xs:block">
+                    <Heart size={38} />
                 </div>
-                <div className="absolute bottom-16 left-[14%] text-white/10 pointer-events-none animate-float-delayed hidden sm:block">
-                    <Baby size={44} />
+                <div className="absolute bottom-16 left-[14%] text-white/40 pointer-events-none animate-float-delayed hidden sm:block">
+                    <Baby size={46} />
                 </div>
-                <div className="absolute bottom-8 left-[24%] text-white/10 pointer-events-none animate-float">
-                    <Sparkles size={20} />
+                <div className="absolute bottom-8 left-[24%] text-white/35 pointer-events-none animate-float">
+                    <Sparkles size={24} />
+                </div>
+                <div className="absolute bottom-28 left-[6%] text-purple-100/35 pointer-events-none animate-float hidden md:block">
+                    <BookOpen size={26} />
+                </div>
+                <div className="absolute bottom-24 left-[20%] text-amber-100/35 pointer-events-none animate-bounce-subtle hidden lg:block">
+                    <Sun size={24} />
+                </div>
+                <div className="absolute bottom-14 left-[28%] w-2 h-2 rounded-full bg-white/40 pointer-events-none animate-pulse-soft" />
+
+                {/* Bottom Center */}
+                <div className="absolute bottom-10 left-[48%] text-white/30 pointer-events-none animate-float hidden sm:block">
+                    <Sparkles size={18} />
                 </div>
 
                 {/* Bottom Right Quadrant */}
-                <div className="absolute bottom-8 right-10 text-white/15 pointer-events-none animate-float-delayed hidden xs:block">
-                    <Baby size={34} />
+                <div className="absolute bottom-8 right-10 text-white/40 pointer-events-none animate-float-delayed hidden xs:block">
+                    <Baby size={36} />
                 </div>
-                <div className="absolute bottom-16 right-[14%] text-white/10 pointer-events-none animate-float hidden sm:block">
-                    <Sparkles size={44} />
+                <div className="absolute bottom-16 right-[14%] text-white/40 pointer-events-none animate-float hidden sm:block">
+                    <Sparkles size={46} />
                 </div>
-                <div className="absolute bottom-6 right-[24%] text-white/10 pointer-events-none animate-bounce-subtle">
-                    <Heart size={24} />
+                <div className="absolute bottom-6 right-[24%] text-pink-100/40 pointer-events-none animate-bounce-subtle">
+                    <Heart size={26} />
                 </div>
+                <div className="absolute bottom-28 right-[6%] text-purple-100/35 pointer-events-none animate-float-delayed hidden md:block">
+                    <Smile size={28} />
+                </div>
+                <div className="absolute bottom-22 right-[20%] text-amber-100/35 pointer-events-none animate-float hidden lg:block">
+                    <Star size={24} />
+                </div>
+                <div className="absolute bottom-14 right-[28%] w-2.5 h-2.5 rounded-full bg-pink-100/40 blur-[0.5px] pointer-events-none animate-pulse-soft" />
 
-                {/* Centered Content: Hero + Verification Card + Prompt without large empty gap */}
-                <div className="relative z-10 w-full max-w-xl flex flex-col items-center">
-                    {/* 2. HERO HEADER SECTION */}
-                    <PortalHero revealed={heroRevealed} />
-
-                    {/* 3. CORE INTERACTIVE WORKSPACE (Staggered reveal after logos settle) */}
-                    <div
-                        className={`w-full flex flex-col items-center transition-all duration-500 ease-out ${
-                            heroRevealed
-                                ? 'delay-500 opacity-100 translate-y-0 pointer-events-auto'
-                                : 'opacity-0 translate-y-4 pointer-events-none'
+                {/* 2-COLUMN SPLIT HERO CONTAINER (FILLS SPACE ON DESKTOP & FLUID ON MOBILE) */}
+                <div
+                    className={`relative z-10 w-full max-w-[1560px] 2xl:max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 2xl:gap-20 items-center my-auto transition-all duration-700 ease-out ${heroMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                         }`}
-                    >
-                        <VisitorVerificationCard
-                            portalFlowState={portalFlowState}
-                            portalCodeInput={portalCodeInput}
-                            setPortalCodeInput={setPortalCodeInput}
-                            codeInputRef={codeInputRef}
-                            isVerifyingCode={isVerifyingCode}
-                            verificationWarning={verificationWarning}
-                            showScanner={showScanner}
-                            startScanner={startScanner}
-                            stopScanner={stopScanner}
-                            scannerLoading={scannerLoading}
-                            videoRef={videoRef}
-                            canvasRef={canvasRef}
-                            onVerifyCode={handleVerifyPortalVisitor}
+                >
+                    {/* LEFT COLUMN: HERO HEADLINE, VALUE PROPOSITION, CTA BUTTONS */}
+                    <div className="lg:col-span-7 xl:col-span-7 w-full flex flex-col items-center lg:items-start">
+                        <PortalHero
                             onRegisterClick={handleGoToRegister}
-                            onResetPortal={handleResetPortal}
-                            activeVisitorProfile={activeVisitorProfile}
-                            selectedServiceForTimeIn={selectedServiceForTimeIn}
-                            setSelectedServiceForTimeIn={setSelectedServiceForTimeIn}
-                            selectedChildren={selectedChildren}
-                            setSelectedChildren={setSelectedChildren}
-                            isRecordingTimeIn={isRecordingTimeIn}
-                            onConfirmTimeIn={handleConfirmTimeIn}
-                            activeVisitRecord={activeVisitRecord}
-                            isRecordingTimeOut={isRecordingTimeOut}
-                            onConfirmTimeoutAndProceedToEval={handleConfirmTimeoutAndProceedToEval}
-                            formatDuration={formatDuration}
-                            timeInSuccessData={timeInSuccessData}
                         />
                     </div>
-                </div>
 
-                {/* Bottom of Section: Know More About Our Services */}
-                <div
-                    className={`absolute bottom-3 sm:bottom-5 left-0 right-0 z-20 flex justify-center pointer-events-auto select-none transition-all duration-500 ease-out ${
-                        heroRevealed ? 'delay-700 opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
-                    }`}
-                >
-                    <a
-                        href="#services"
-                        className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-violet-200/90 hover:text-white transition-all py-1.5 px-4 rounded-full hover:bg-white/10 cursor-pointer group"
-                    >
-                        <span>Know more about our services</span>
-                        <ChevronDown size={16} className="animate-bounce text-pink-300 group-hover:text-white transition-colors" />
-                    </a>
+                    {/* RIGHT COLUMN: VERIFICATION CARD */}
+                    <div className="lg:col-span-5 xl:col-span-5 w-full flex flex-col items-center lg:items-end justify-center">
+                        <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl">
+                            <VisitorVerificationCard
+                                portalFlowState={portalFlowState}
+                                portalCodeInput={portalCodeInput}
+                                setPortalCodeInput={setPortalCodeInput}
+                                codeInputRef={codeInputRef}
+                                isVerifyingCode={isVerifyingCode}
+                                verificationWarning={verificationWarning}
+                                showScanner={showScanner}
+                                startScanner={startScanner}
+                                stopScanner={stopScanner}
+                                scannerLoading={scannerLoading}
+                                videoRef={videoRef}
+                                canvasRef={canvasRef}
+                                onVerifyCode={handleVerifyPortalVisitor}
+                                onRegisterClick={handleGoToRegister}
+                                onResetPortal={handleResetPortal}
+                                activeVisitorProfile={activeVisitorProfile}
+                                selectedServiceForTimeIn={selectedServiceForTimeIn}
+                                setSelectedServiceForTimeIn={setSelectedServiceForTimeIn}
+                                selectedChildren={selectedChildren}
+                                setSelectedChildren={setSelectedChildren}
+                                isRecordingTimeIn={isRecordingTimeIn}
+                                onConfirmTimeIn={handleConfirmTimeIn}
+                                activeVisitRecord={activeVisitRecord}
+                                isRecordingTimeOut={isRecordingTimeOut}
+                                onConfirmTimeoutAndProceedToEval={handleConfirmTimeoutAndProceedToEval}
+                                formatDuration={formatDuration}
+                                timeInSuccessData={timeInSuccessData}
+                            />
+                        </div>
+                    </div>
                 </div>
             </section>
 

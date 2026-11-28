@@ -40,19 +40,19 @@ export default function VisitorVerificationCard({
         <div className="w-full flex flex-col items-center">
             {/* MODE A: VERIFY VISITOR (CODE ID / QR ONLY - NO EMAIL) */}
             {portalFlowState === 'verify' && (
-                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-[45px] p-5 sm:p-7 border border-slate-200/90 shadow-2xl shadow-purple-950/20 max-w-md sm:max-w-lg mx-auto w-full">
-                    <div className="text-center mb-4 sm:mb-5">
-                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-1">
+                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-[38px] sm:rounded-[45px] lg:rounded-[50px] p-6 sm:p-8 lg:p-10 xl:p-11 border border-slate-200/90 shadow-2xl shadow-purple-950/25 max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto w-full">
+                    <div className="text-center mb-5 sm:mb-6">
+                        <h3 className="text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-black text-[#7030a0] tracking-tight mb-2">
                             Time In & Departure
                         </h3>
-                        <p className="text-slate-500 text-xs sm:text-sm font-medium leading-relaxed">
+                        <p className="text-slate-500 text-xs sm:text-sm lg:text-base font-medium leading-relaxed">
                             Enter your Visitor Code ID or scan your Access Pass QR code to continue.
                         </p>
                     </div>
 
-                    <div className="space-y-3 mb-4 sm:mb-5">
+                    <div className="space-y-4 mb-5 sm:mb-6">
                         <div>
-                            <label className="block text-slate-700 text-xs font-bold mb-1.5 text-left">
+                            <label className="block text-slate-700 text-xs sm:text-sm lg:text-base font-bold mb-2 text-left">
                                 Visitor Code ID <span className="text-red-500">*</span>
                             </label>
                             <div className="relative flex items-center">
@@ -71,21 +71,21 @@ export default function VisitorVerificationCard({
                                         }
                                     }}
                                     placeholder="e.g. 54321"
-                                    className="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-base font-bold tracking-widest outline-none focus:border-[#7030a0] focus:ring-4 focus:ring-violet-100 focus:bg-white transition-all text-slate-800 placeholder:tracking-normal placeholder:font-normal placeholder:text-slate-400"
+                                    className="w-full pl-5 pr-14 py-3.5 sm:py-4 lg:py-4.5 bg-slate-50 border border-slate-200 rounded-2xl text-lg sm:text-xl lg:text-2xl font-black tracking-widest outline-none focus:border-[#7030a0] focus:ring-4 focus:ring-violet-100 focus:bg-white transition-all text-slate-800 placeholder:tracking-normal placeholder:font-normal placeholder:text-slate-400"
                                 />
                                 <button
                                     type="button"
                                     onClick={showScanner ? stopScanner : startScanner}
-                                    className={`absolute right-2 p-2 rounded-xl transition-all cursor-pointer ${showScanner
+                                    className={`absolute right-2.5 p-2.5 sm:p-3 rounded-xl transition-all cursor-pointer ${showScanner
                                         ? 'bg-red-50 text-red-500 hover:bg-red-100'
                                         : 'bg-violet-50 text-[#7030a0] hover:bg-violet-100'
                                         }`}
                                     title={showScanner ? 'Close Scanner' : 'Scan Access Pass QR Code'}
                                 >
-                                    <Camera size={18} />
+                                    <Camera size={20} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                                 </button>
                             </div>
-                            <span className="text-[10px] text-slate-400 mt-1 block text-left font-medium">
+                            <span className="text-[11px] sm:text-xs lg:text-sm text-slate-400 mt-2 block text-left font-medium">
                                 * Use your registered 5-digit number or click the camera icon to scan your QR pass.
                             </span>
                         </div>
@@ -125,7 +125,7 @@ export default function VisitorVerificationCard({
                         type="button"
                         onClick={() => onVerifyCode()}
                         disabled={isVerifyingCode || !portalCodeInput.trim()}
-                        className="w-full py-3.5 bg-[#7030a0] hover:bg-[#5b2484] text-white rounded-2xl font-bold hover:shadow-lg active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md shadow-violet-200"
+                        className="w-full py-4 sm:py-4.5 bg-[#7030a0] hover:bg-[#5b2484] text-white rounded-2xl font-black hover:shadow-lg active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-xs sm:text-sm lg:text-base disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md shadow-violet-200 uppercase tracking-wider"
                     >
                         {isVerifyingCode ? (
                             <>
@@ -158,7 +158,7 @@ export default function VisitorVerificationCard({
 
             {/* MODE B: VISITOR VERIFIED -> SELECT SERVICE TO TIME IN (NO ACTIVE VISIT TODAY) */}
             {portalFlowState === 'select_service' && activeVisitorProfile && (
-                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-[45px] p-5 sm:p-7 border border-slate-200/90 shadow-2xl shadow-purple-950/20 max-w-xl mx-auto w-full">
+                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-[38px] sm:rounded-[45px] lg:rounded-[50px] p-6 sm:p-8 lg:p-10 border border-slate-200/90 shadow-2xl shadow-purple-950/25 max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto w-full">
                     <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100">
                         <button
                             type="button"
@@ -279,7 +279,7 @@ export default function VisitorVerificationCard({
 
             {/* MODE C: ACTIVE VISIT FOUND -> "TIME OUT TO THIS SERVICE? -> EVALUATION FORM" */}
             {portalFlowState === 'confirm_timeout' && activeVisitRecord && activeVisitorProfile && (
-                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-[45px] p-5 sm:p-7 border border-violet-200 shadow-2xl shadow-purple-950/20 max-w-lg mx-auto w-full text-left">
+                <div className="animate-in fade-in zoom-in-95 duration-400 bg-white rounded-[38px] sm:rounded-[45px] lg:rounded-[50px] p-6 sm:p-8 lg:p-10 border border-violet-200 shadow-2xl shadow-purple-950/25 max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto w-full text-left">
                     <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100">
                         <button
                             type="button"
@@ -356,7 +356,7 @@ export default function VisitorVerificationCard({
 
             {/* MODE D: CHECK-IN SUCCESS CONFIRMATION */}
             {portalFlowState === 'checkin_success' && timeInSuccessData && (
-                <div className="animate-in zoom-in-95 duration-400 bg-white rounded-[45px] p-5 sm:p-7 border border-emerald-200 shadow-2xl shadow-purple-950/20 max-w-lg mx-auto w-full text-center">
+                <div className="animate-in zoom-in-95 duration-400 bg-white rounded-[38px] sm:rounded-[45px] lg:rounded-[50px] p-6 sm:p-8 lg:p-10 border border-emerald-200 shadow-2xl shadow-purple-950/25 max-w-md sm:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto w-full text-center">
                     <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 border border-emerald-200 shadow-inner">
                         <CheckCircle2 size={32} />
                     </div>
@@ -396,27 +396,12 @@ export default function VisitorVerificationCard({
                     <button
                         type="button"
                         onClick={onResetPortal}
-                        className="w-full py-3 bg-[#7030a0] hover:bg-[#5b2484] text-white rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer"
+                        className="w-full py-3.5 bg-[#7030a0] hover:bg-[#5b2484] text-white rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md active:scale-95 cursor-pointer"
                     >
                         Return to Home
                     </button>
                 </div>
             )}
-
-            {/* FIRST TIME REGISTRATION PROMPT */}
-            <div className="mt-4 sm:mt-5 text-center">
-                <p className="text-xs sm:text-sm text-violet-200 font-medium">
-                    First Time? Click {' '}
-                    <button
-                        type="button"
-                        onClick={onRegisterClick}
-                        className="font-extrabold text-white underline hover:text-pink-200 cursor-pointer"
-                    >
-                        here
-                    </button>{' '}
-                    to register
-                </p>
-            </div>
         </div>
     );
 }
